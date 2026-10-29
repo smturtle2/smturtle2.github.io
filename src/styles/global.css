@@ -1,0 +1,50 @@
+@import '@fontsource/pretendard/400.css';
+@import '@fontsource/pretendard/700.css';
+
+:root {
+  color-scheme: light;
+  --color-bg: #fff;
+  --color-ink: #191919;
+  --color-sub: #555;
+  --color-muted: #6b6b6b;
+  --color-rule: #e2e2e2;
+  --color-accent: #2350d8;
+  --color-tint: #f4f6fb;
+  font-family: 'Pretendard', system-ui, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  color: var(--color-ink);
+  background: var(--color-bg);
+  font-synthesis: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+body, h1, h2, p, ul {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+::selection {
+  color: var(--color-ink);
+  background: #dfe7ff;
+}

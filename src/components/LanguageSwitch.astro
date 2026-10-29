@@ -1,0 +1,123 @@
+---
+import { type Locale, type PageKey, locales, messages, localePath } from '../i18n';
+
+interface Props {
+  /** Current page language; undefined on the neutral root, where nothing is marked. */
+  locale?: Locale;
+  page?: PageKey;
+}
+
+const { locale, page = 'home' } = Astro.props;
+
+// Each link is named in its own language, independent of the page language.
+const languages = {
+  ko: { short: 'KO', label: 'KO · 한국어로 보기' },
+  en: { short: 'EN', label: 'EN · View in English' },
+} as const satisfies Record<Locale, { short: string; label: string }>;
+---
+
+<nav class="language-switch" aria-label={messages[locale ?? 'en'].languageLabel}>
+  <ul role="list">
+    {locales.map((target) => (
+      <li>
+        <a
+          class="language-link"
+          href={localePath(target, page)}
+          data-language={target}
+          lang={target}
+          hreflang={target}
+          aria-label={languages[target].label}
+          aria-current={target === locale ? 'page' : undefined}
+        >{languages[target].short}</a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<script>
+  import { initLanguageLinks } from '../scripts/language-preference';
+
+  initLanguageLinks();
+</script>
+
+<style>
+  .language-switch {
+    /* Pull the hit area outward so the visible "EN" lines up with the content edge */
+    margin-inline-end: -7px;
+  }
+
+  .language-switch ul {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    list-style: none;
+  }
+
+  .language-switch li {
+    display: flex;
+    align-items: center;
+  }
+
+  .language-switch li + li::before {
+    content: '';
+    width: 1px;
+    height: 12px;
+    background: var(--color-rule);
+  }
+
+  /* Fixed box so the 400 → 700 weight change never shifts the layout */
+  .language-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 2px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    color: var(--color-muted);
+    text-decoration: none;
+  }
+
+  .language-link[aria-current='page'] {
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+
+  .language-link[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    top: calc(50% + 10px);
+    left: 50%;
+    width: 12px;
+    height: 2px;
+    margin-left: -6px;
+    background: currentColor;
+  }
+
+  @media (hover: hover) {
+    .language-link:not([aria-current]):hover {
+      color: var(--color-ink);
+    }
+  }
+
+  .language-link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 0;
+  }
+
+  @media (pointer: coarse) {
+    .language-switch {
+      margin-block: -6px;
+      margin-inline-end: -13px;
+    }
+
+    .language-link {
+      width: 44px;
+      height: 44px;
+    }
+  }
+</style>

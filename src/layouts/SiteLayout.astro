@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+import { localePath, locales, type Locale, type PageKey } from '../i18n';
+
+interface Props {
+  title: string;
+  description: string;
+  path?: string;
+  locale: Locale;
+  page?: PageKey;
+}
+
+const { title, description, locale, page = 'home', path } = Astro.props;
+const canonical = new URL(path ?? localePath(locale, page), Astro.site);
+const socialLocales = { ko: 'ko_KR', en: 'en_US' } as const;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="canonical" href={canonical} />
+    {locales.map((language) => (
+      <link rel="alternate" hreflang={language} href={new URL(localePath(language, page), Astro.site)} />
+    ))}
+    {page === 'home' && <link rel="alternate" hreflang="x-default" href={new URL('/', Astro.site)} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={socialLocales[locale]} />
+    <meta property="og:locale:alternate" content={socialLocales[locale === 'ko' ? 'en' : 'ko']} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
