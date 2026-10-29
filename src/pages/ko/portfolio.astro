@@ -1,0 +1,112 @@
+---
+import { Image } from 'astro:assets';
+import DocumentLayout from '../../layouts/DocumentLayout.astro';
+import ClearNetDiagram from '../../components/documents/ClearNetDiagram.astro';
+import DataFlowDiagram from '../../components/documents/DataFlowDiagram.astro';
+import ClickbaitFlowDiagram from '../../components/documents/ClickbaitFlowDiagram.astro';
+import sceneBefore from '../../assets/portfolio/scene_before.jpg';
+import sceneMid from '../../assets/portfolio/scene_mid.jpg';
+import sceneAfter from '../../assets/portfolio/scene_after.jpg';
+import patch1 from '../../assets/portfolio/patch_1.jpg';
+import patch2 from '../../assets/portfolio/patch_2.jpg';
+import patch3 from '../../assets/portfolio/patch_3.jpg';
+import patch4 from '../../assets/portfolio/patch_4.jpg';
+import patch5 from '../../assets/portfolio/patch_5.jpg';
+import seeker from '../../assets/portfolio/seeker.png';
+import hover from '../../assets/portfolio/hover.png';
+---
+<DocumentLayout locale="ko" page="portfolio" title="신동주 포트폴리오" description="위성영상 복원 모델 CLEAR-Net과 낚시성 기사 분류 서비스 Click-bait Seeker의 설계와 구현.">
+  <section class="sheet overview">
+    <header class="portfolio-header">
+      <div><h1>신동주</h1><p>Machine Learning Engineer</p></div>
+      <address><a href="mailto:smturtle2@kakao.com">smturtle2@kakao.com</a><a href="https://github.com/smturtle2">github.com/smturtle2</a><a href="https://huggingface.co/Hermanni">huggingface.co/Hermanni</a></address>
+    </header>
+    <header class="project-header">
+      <div class="row"><h2><span class="entry-title">CLEAR-Net</span><span class="entry-desc">SAR·광학 위성영상 구름 제거(Sentinel-1/2)</span></h2><p class="date">2026.03 ~ 2026.06</p></div>
+      <div class="row meta"><p class="context">동국대학교 종합설계1 · 4인 팀 · 최우수상</p><div class="links" aria-label="CLEAR-Net 관련 자료"><a href="https://github.com/smturtle2/cr-project">모델 코드</a><a href="https://huggingface.co/Hermanni/clear-net-sen12mscr">모델 가중치</a><a href="https://github.com/smturtle2/cr-train">학습 패키지</a><a href="https://huggingface.co/datasets/Hermanni/sen12mscr-v2">공개 데이터셋</a></div></div>
+    </header>
+    <p class="lead">ACA-CRNet을 기준 모델로, 구름 없는 영역의 변경을 줄이기 위한 밴드별 마스크 혼합 구조 설계·구현</p>
+    <p>모델 설계·구현, 학습 데이터 재구성, 팀 공용 학습·평가 환경 담당</p>
+    <figure class="scene-strip">
+      <div><Image src={sceneBefore} alt="구름 낀 광학 영상 장면" loading="eager" /><p><strong>구름 낀 광학 영상</strong></p></div>
+      <div><Image src={sceneMid} alt="패치별 복원 결과가 일부 채워진 장면" loading="eager" /><p><strong>패치별 복원 진행</strong></p></div>
+      <div><Image src={sceneAfter} alt="CLEAR-Net 전체 장면 복원 결과" loading="eager" /><p><strong>전체 장면 복원 결과(검증 세트)</strong></p></div>
+    </figure>
+    <h3>후보 모델 비교를 위한 학습·평가 환경</h3>
+    <p>원본 389GB를 서버마다 받아 두기 어렵고, 스트리밍의 셔플 순서가 불안정해 실험 비교가 어려움</p>
+    <ol class="candidate-path">
+      <li><strong>parquet 스트리밍</strong><div><span>HF datasets로 바로 스트리밍 → 셔플 순서와 종료 처리가 불안정</span></div></li>
+      <li><strong>블록 캐시</strong><div><span>seed 기반 블록 선택으로 순서를 재현했으나 로컬 사본 필요</span></div></li>
+      <li><strong>압축 블록 포맷</strong><div><span>32장씩 zstd로 묶은 포맷으로 데이터셋을 다시 공개하고 블록 단위 스트리밍으로 교체</span></div></li>
+      <li class="final-candidate"><strong>분산 학습 대응</strong><div><span>GPU마다 다른 블록을 나눠 읽고 지표를 모아 기록</span></div></li>
+    </ol>
+    <figure class="diagram"><DataFlowDiagram locale="ko" /></figure>
+    <ul class="plain-list">
+      <li>데이터 선택·읽기 순서를 고정해 서버가 달라도 같은 데이터를 같은 순서로 학습</li>
+      <li>전처리·학습·평가·지표 기록을 <code>cr-train</code>으로 분리해 후보 4종을 같은 절차로 비교</li>
+      <li>팀원 코드 병합 후 지표 계산을 점검해 MAE만 다른 값 범위로 계산되던 문제 수정</li>
+    </ul>
+  </section>
+  <section class="sheet model-design">
+    <h2>모델 설계 과정</h2>
+    <p class="lead"><a href="https://arxiv.org/abs/2411.13042">ACA-CRNet</a>은 SAR·광학을 입력 단계에서 합쳐 영상 전체에 보정값을 더해 구름 없는 영역도 바뀔 수 있음 → 구름 영역 중심으로 복원하도록 마스크와 복원 후보를 분리</p>
+    <ol class="candidate-path">
+      <li><strong>LCR</strong><div><span>latent 공간의 local·global attention과 cross-attention으로 영상 결합</span></div></li>
+      <li><strong>FDT</strong><div><span>공통·고유 성분 분해, SSIM·CCC·CKA 손실 비교</span><span>영상 융합용 기준의 목적 차이와 13:2 채널 차이의 편향 가능성을 팀원과 검토</span></div></li>
+      <li><strong>FDT-CCA</strong><div><span>복원용·구름 성분 분해와 밴드별 마스크 혼합</span></div></li>
+      <li class="final-candidate"><strong>CLEAR-Net</strong><div><span>분해·마스크 구조를 단순화해 독립 모델로 구현</span></div></li>
+    </ol>
+    <h3>구름 성분 분리와 밴드별 마스크 혼합</h3>
+    <figure class="diagram model-diagram"><ClearNetDiagram locale="ko" /></figure>
+    <p class="formula">prediction = cloudy ⊙ (1 − mask) + candidate ⊙ mask</p>
+    <p>마스크가 0에 가까울수록 원본 비중 증가 · 최종 출력·복원 후보·보조 출력에 L1 + SSIM 적용</p>
+    <p>학습된 마스크이므로 구름 없는 모든 위치의 원본 보존을 보장하지 않음</p>
+  </section>
+  <section class="sheet evaluation">
+    <h2>복원 성능과 추론 효율</h2>
+    <h3>ACA-CRNet 대비 SSIM 개선 (0.8909 → 0.8936)</h3>
+    <div class="evaluation-overview"><table class="metrics">
+      <caption>SEN12MS-CR 테스트셋 7,899장</caption>
+      <thead><tr><th>모델</th><th>MAE ↓</th><th>PSNR ↑</th><th>SSIM ↑</th><th>SAM ↓</th></tr></thead>
+      <tbody><tr><th>ACA-CRNet</th><td><strong>0.0265</strong></td><td><strong>29.41</strong></td><td>0.8909</td><td><strong>7.910</strong></td></tr><tr><th>CLEAR-Net</th><td>0.0274</td><td>28.46</td><td class="accent"><strong>0.8936</strong></td><td>8.244</td></tr></tbody>
+    </table><figure class="inputs"><div><Image src={patch1} alt="구름 낀 광학 입력" loading="eager" /><p>광학 입력</p></div><div><Image src={patch2} alt="SAR 입력" loading="eager" /><p>SAR 입력</p></div></figure></div>
+    <figure class="patch-comparison">
+
+      <div class="outputs"><div><Image src={patch3} alt="ACA-CRNet 결과" loading="eager" /><p>ACA-CRNet</p></div><div class="selected"><Image src={patch4} alt="CLEAR-Net 결과" loading="eager" /><p>CLEAR-Net</p></div><div><Image src={patch5} alt="정답 영상" loading="eager" /><p>정답</p></div></div>
+      <figcaption>제시한 예시에서는 ACA-CRNet보다 강과 길의 형태가 더 잘 드러나지만, 색은 정답보다 녹색에 가깝습니다.</figcaption>
+    </figure>
+    <p>SSIM은 개선됐으나 MAE·PSNR·SAM은 기준 모델에 미달. 구성 요소별 ablation과 마스크 품질 평가는 미수행</p>
+    <h3>SDPA로 contextual attention 재구현</h3>
+    <p>모든 위치 쌍의 attention 행렬을 한 번에 생성해 메모리가 위치 수의 제곱으로 증가 → PyTorch SDPA로 재구현해 최종 모델에도 적용</p>
+    <h4 class="measure-scope">특징 분해 실험 모델 · 추론</h4>
+    <div class="bars">
+      <div><h4>VRAM ↓</h4><div class="bar-row"><span>교체 전</span><div class="track" style="--value:72%"><div class="bar"></div><span class="value">6,264 MB</span></div></div><div class="bar-row"><span>교체 후</span><div class="track" style="--value:8.32%"><div class="bar after"></div><span class="value">724 MB</span></div></div></div>
+      <div><h4>처리량 ↑</h4><div class="bar-row"><span>교체 전</span><div class="track" style="--value:42.31%"><div class="bar"></div><span class="value">4.63 img/s</span></div></div><div class="bar-row"><span>교체 후</span><div class="track" style="--value:72%"><div class="bar after"></div><span class="value">7.88 img/s</span></div></div></div>
+    </div>
+  </section>
+  <section class="sheet clickbait">
+    <header class="project-header">
+      <div class="row"><h2><span class="entry-title">Click-bait Seeker</span><span class="entry-desc">낚시성 기사 분류 Chrome 확장 프로그램</span></h2><p class="date">2024.09 ~ 2024.12</p></div>
+      <div class="row meta"><p class="context">동국대학교 공개SW프로젝트 · 4인 팀</p><div class="links" aria-label="Click-bait Seeker 관련 자료"><a href="https://github.com/CSID-DGU/2024-02-CSC4004-2-2-NewEngineeringCenterGhost">프로젝트 코드</a><a href="https://chromewebstore.google.com/detail/blcclfjholbpgmmbnghodhlkagepjbbh">Chrome 웹 스토어</a></div></div>
+    </header>
+    <p class="lead">AI Hub 낚시성 기사 약 73만 건으로 분류 모델 학습, 모델이 주목한 주요 문장을 기사 화면에 표시</p>
+    <p>전처리·모델 학습, 주요 문장 추출, Python 추론 서버, 확장 프로그램 결과·GPT 해설 표시 담당</p>
+    <figure class="shots"><div><Image src={seeker} alt="분류 확률과 GPT 해설, 주요 문장 강조를 보여 주는 기사 분석 화면" loading="eager" format="png" /><p>기사 분석: 확률·GPT 해설과 주요 문장 강조</p></div><div><Image src={hover} alt="링크에 마우스를 올렸을 때 낚시성 확률 표시" loading="eager" format="png" /><p>링크에 마우스를 올리면 확률 표시</p></div></figure>
+    <figure class="diagram"><ClickbaitFlowDiagram locale="ko" /></figure>
+    <p>팀원이 구현한 Spring Boot 서버와 Python 추론 서버 연동</p>
+    <div class="two-columns">
+      <section><h3>자모 단위 FastText</h3><p>오탈자 대응을 위해 별도 한국어 코퍼스로 임베딩을 학습하고 Transformer 분류 모델의 입력으로 사용</p>
+        <table class="typo"><thead><tr><th>오타</th><th>분해 없이</th><th>자모 분해</th></tr></thead><tbody><tr><th>스맡폰</th><td>이 · 증기</td><td><strong>스마트 · 스마트폰</strong></td></tr><tr><th>ㅏㅣ폰</th><td>매료 · 베이지</td><td><strong>아이폰</strong> · 폰</td></tr><tr><th>햄벅</th><td>해질 · 낙관</td><td><strong>햄버거</strong> · 핫도그</td></tr></tbody></table>
+      </section>
+      <section><h3>주요 문장 추출·강조</h3>
+        <ul class="plain-list">
+          <li>PyTorch Transformer 기반 분류 모델이 층별 attention을 반환하도록 수정</li>
+          <li>attention 점수가 높은 토큰이 속한 문장 추출</li>
+          <li>마지막 층만 사용하는 방식과 층별 attention 결합(rollout)의 추출 문장을 직접 비교해 rollout 적용</li>
+          <li>형태소를 이어 붙인 문장과 공백을 제거한 본문을 대조해 강조 위치 탐색</li>
+          <li>문장별 정답이 없어 정량 평가는 미수행. attention은 분류 판단의 원인을 증명하지 않음</li>
+        </ul>
+      </section>
+    </div>
+  </section>
+</DocumentLayout>

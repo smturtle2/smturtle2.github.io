@@ -1,0 +1,59 @@
+---
+import DocumentLayout from '../../layouts/DocumentLayout.astro';
+---
+
+<DocumentLayout locale="ko" page="resume" title="신동주 이력서" description="신동주의 학력, 머신러닝 프로젝트 경험과 사용 기술.">
+  <article class="sheet resume-sheet">
+    <header class="resume-header">
+      <h1>신동주</h1>
+      <p class="position">Machine Learning Engineer</p>
+      <p class="contacts">
+        <a href="mailto:smturtle2@kakao.com">smturtle2@kakao.com</a>
+        <a href="https://github.com/smturtle2">github.com/smturtle2</a>
+        <a href="https://huggingface.co/Hermanni">huggingface.co/Hermanni</a>
+      </p>
+    </header>
+
+    <section class="resume-section education" aria-label="학력">
+      <h2>학력</h2>
+      <article class="entry">
+        <div class="row"><h3><span class="entry-title">동국대학교</span></h3><p class="date">2020.03 ~ 2026.08 졸업</p></div>
+        <div class="row meta"><p>AI소프트웨어융합학부 멀티미디어소프트웨어공학전공</p><p>학점 4.14 / 4.5</p></div>
+      </article>
+    </section>
+
+    <section class="resume-section projects" aria-label="프로젝트">
+      <h2>프로젝트</h2>
+      <article class="entry project" aria-label="CLEAR-Net">
+        <header class="project-header">
+          <div class="row"><h3><span class="entry-title">CLEAR-Net</span><span class="entry-desc">SAR·광학 위성영상 구름 제거(Sentinel-1/2)</span></h3><p class="date">2026.03 ~ 2026.06</p></div>
+          <div class="row meta"><p class="context">동국대학교 종합설계1 · 4인 팀 · 최우수상</p><div class="links" aria-label="CLEAR-Net 관련 자료"><a href="https://github.com/smturtle2/cr-project">모델 코드</a><a href="https://huggingface.co/Hermanni/clear-net-sen12mscr">모델 가중치</a><a href="https://github.com/smturtle2/cr-train">학습 패키지</a><a href="https://huggingface.co/datasets/Hermanni/sen12mscr-v2">공개 데이터셋</a></div></div>
+        </header>
+        <ul class="items">
+          <li><span class="line">ACA-CRNet 기반 복원 모델 설계·구현</span><span class="line">구름 없는 영역의 변경을 줄이도록 밴드별 마스크로 원본과 복원 영상 혼합</span></li>
+          <li><span class="line">SEN12MS-CR 데이터셋 재구성·공개(389GB → 240GB)</span><span class="line">전체 데이터를 로컬에 보관하지 않고 학습할 수 있도록 스트리밍 로더 개발</span></li>
+          <li><span class="line">팀 공용 학습·평가 패키지를 개발해 후보 모델 4종 비교에 활용</span><span class="line">4-GPU DDP 분산 학습, 평가 지표 계산 방식 통일</span></li>
+          <li><span class="line">contextual attention을 PyTorch SDPA로 재구현해 최종 모델에 적용</span><span class="line">특징 분해 실험 모델 추론: VRAM 6,264MB → 724MB, 처리량 4.63 → 7.88 img/s</span></li>
+        </ul>
+      </article>
+
+      <article class="entry project" aria-label="Click-bait Seeker">
+        <header class="project-header">
+          <div class="row"><h3><span class="entry-title">Click-bait Seeker</span><span class="entry-desc">낚시성 기사 분류 Chrome 확장 프로그램</span></h3><p class="date">2024.09 ~ 2024.12</p></div>
+          <div class="row meta"><p class="context">동국대학교 공개SW프로젝트 · 4인 팀</p><div class="links" aria-label="Click-bait Seeker 관련 자료"><a href="https://github.com/CSID-DGU/2024-02-CSC4004-2-2-NewEngineeringCenterGhost">프로젝트 코드</a><a href="https://chromewebstore.google.com/detail/blcclfjholbpgmmbnghodhlkagepjbbh">Chrome 웹 스토어</a></div></div>
+        </header>
+        <ul class="items">
+          <li><span class="line">오탈자에 대응하도록 별도 한국어 코퍼스로 자모 단위 FastText 임베딩 학습</span><span class="line">AI Hub 기사 약 73만 건 전처리, Transformer 분류 모델 학습</span></li>
+          <li><span class="line">PyTorch Transformer 기반 분류 모델이 층별 attention을 반환하도록 수정</span><span class="line">attention rollout으로 주요 문장 선정 및 기사 본문 강조</span></li>
+          <li><span class="line">Python 추론 서버 개발, Spring Boot 서버와 연동</span><span class="line">확장 프로그램에 분류 결과·GPT 해설 표시 기능 구현</span></li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="resume-section skills" aria-label="기술">
+      <h2>기술</h2>
+      <p>Python · C/C++ · PyTorch</p>
+      <p>컴퓨터 비전 · 자연어 처리 · 분산 학습 · 대용량 데이터 처리</p>
+    </section>
+  </article>
+</DocumentLayout>

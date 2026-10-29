@@ -1,0 +1,59 @@
+---
+import DocumentLayout from '../../layouts/DocumentLayout.astro';
+---
+
+<DocumentLayout locale="en" page="resume" title="SHIN DONGJU Resume" description="SHIN DONGJU's education, machine learning projects, and technical skills.">
+  <article class="sheet resume-sheet">
+    <header class="resume-header">
+      <h1>SHIN DONGJU</h1>
+      <p class="position">Machine Learning Engineer</p>
+      <p class="contacts">
+        <a href="mailto:smturtle2@kakao.com">smturtle2@kakao.com</a>
+        <a href="https://github.com/smturtle2">github.com/smturtle2</a>
+        <a href="https://huggingface.co/Hermanni">huggingface.co/Hermanni</a>
+      </p>
+    </header>
+
+    <section class="resume-section education" aria-label="Education">
+      <h2>Education</h2>
+      <article class="entry">
+        <div class="row"><h3><span class="entry-title">Dongguk University</span></h3><p class="date">Mar 2020 – Aug 2026 · Graduated</p></div>
+        <div class="row meta"><p>Division of AI Software Convergence · Multimedia Software Engineering</p><p>GPA 4.14 / 4.5</p></div>
+      </article>
+    </section>
+
+    <section class="resume-section projects" aria-label="Projects">
+      <h2>Projects</h2>
+      <article class="entry project" aria-label="CLEAR-Net">
+        <header class="project-header">
+          <div class="row"><h3><span class="entry-title">CLEAR-Net</span><span class="entry-desc">SAR-optical satellite cloud removal (Sentinel-1/2)</span></h3><p class="date">Mar 2026 – Jun 2026</p></div>
+          <div class="row meta"><p class="context">Dongguk University Capstone Design 1 · Team of 4 · Excellence Award</p><div class="links" aria-label="CLEAR-Net resources"><a href="https://github.com/smturtle2/cr-project">Model code</a><a href="https://huggingface.co/Hermanni/clear-net-sen12mscr">Weights</a><a href="https://github.com/smturtle2/cr-train">Training package</a><a href="https://huggingface.co/datasets/Hermanni/sen12mscr-v2">Dataset</a></div></div>
+        </header>
+        <ul class="items">
+          <li><span class="line">Designed and implemented an ACA-CRNet-based restoration model</span><span class="line">Bandwise masks blend original and restored images to limit changes in cloud-free areas</span></li>
+          <li><span class="line">Rebuilt and published SEN12MS-CR (389 GB → 240 GB)</span><span class="line">Streaming loader for training without storing the full dataset locally</span></li>
+          <li><span class="line">Built a shared training and evaluation package to compare four candidate models</span><span class="line">4-GPU DDP training; unified metric computation</span></li>
+          <li><span class="line">Reimplemented contextual attention with PyTorch SDPA for the final model</span><span class="line">Feature-decomposition experiment, inference: VRAM 6,264 → 724 MB; 4.63 → 7.88 img/s</span></li>
+        </ul>
+      </article>
+
+      <article class="entry project" aria-label="Click-bait Seeker">
+        <header class="project-header">
+          <div class="row"><h3><span class="entry-title">Click-bait Seeker</span><span class="entry-desc">Chrome extension for clickbait classification</span></h3><p class="date">Sep 2024 – Dec 2024</p></div>
+          <div class="row meta"><p class="context">Dongguk University Open Source Software Project · Team of 4</p><div class="links" aria-label="Click-bait Seeker resources"><a href="https://github.com/CSID-DGU/2024-02-CSC4004-2-2-NewEngineeringCenterGhost">Project code</a><a href="https://chromewebstore.google.com/detail/blcclfjholbpgmmbnghodhlkagepjbbh">Chrome Web Store</a></div></div>
+        </header>
+        <ul class="items">
+          <li><span class="line">Trained Jamo-level FastText on a separate Korean corpus for typo robustness</span><span class="line">Preprocessed about 730K AI Hub articles; trained a Transformer classifier</span></li>
+          <li><span class="line">Modified the PyTorch Transformer classifier to return per-layer attention</span><span class="line">Selected key sentences with attention rollout and highlighted them in the article</span></li>
+          <li><span class="line">Built a Python inference server integrated with the Spring Boot server</span><span class="line">Displayed classification results and GPT commentary in the extension</span></li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="resume-section skills" aria-label="Skills">
+      <h2>Skills</h2>
+      <p>Python · C/C++ · PyTorch</p>
+      <p>Computer vision · NLP · Distributed training · Large-scale data processing</p>
+    </section>
+  </article>
+</DocumentLayout>

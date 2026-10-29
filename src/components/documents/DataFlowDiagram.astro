@@ -1,0 +1,23 @@
+---
+interface Props { locale: 'ko' | 'en'; }
+const { locale } = Astro.props;
+const en = locale === 'en';
+---
+<div class="diagram-viewport">
+  <svg viewBox="-0.5 0 171 16" role="img" aria-label={en ? 'Streaming data: published blocks, prefetching, temporary local storage, distributed training' : '스트리밍 데이터: 공개 블록, 미리 다운로드, 로컬 임시 저장, 분산 학습'}>
+    <defs><marker id="data-flow-arrow" viewBox="0 0 8 8" refX="7.2" refY="4" markerUnits="userSpaceOnUse" markerWidth="1.9" markerHeight="1.9" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="arrow-head" /></marker></defs>
+    <rect class="box" x="0" y="0.5" width="38" height="15" rx="0.8" />
+    <rect class="box accent" x="44" y="0.5" width="38" height="15" rx="0.8" />
+    <rect class="box accent" x="88" y="0.5" width="38" height="15" rx="0.8" />
+    <rect class="box" x="132" y="0.5" width="38" height="15" rx="0.8" />
+    <path class="arrow" marker-end="url(#data-flow-arrow)" d="M38,8 H43.6" /><path class="arrow" marker-end="url(#data-flow-arrow)" d="M82,8 H87.6" /><path class="arrow" marker-end="url(#data-flow-arrow)" d="M126,8 H131.6" />
+    <text class="label" x="2.4" y="6.4">{en ? 'Hugging Face' : 'Hugging Face 공개'}</text>
+    <text class="detail" x="2.4" y="11.6">389GB → 240GB</text>
+    <text class="label active" x="46.4" y="6.4">{en ? 'Download worker' : '다운로드 프로세스'}</text>
+    <text class="detail" x="46.4" y="11.6">{en ? 'Prefetch next block' : '다음 블록 미리 받기'}</text>
+    <text class="label active" x="90.4" y="6.4">{en ? 'Local cache (~5 GB)' : '로컬 캐시 (약 5GB)'}</text>
+    <text class="detail" x="90.4" y="11.6">{en ? 'Delete used blocks' : '사용한 블록 삭제'}</text>
+    <text class="label" x="134.4" y="6.4">{en ? 'DDP training' : 'DDP 학습'}</text>
+    <text class="detail" x="134.4" y="11.6">{en ? 'Blocks split per GPU' : 'GPU마다 서로 다른 블록'}</text>
+  </svg>
+</div>

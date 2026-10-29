@@ -1,0 +1,53 @@
+---
+interface Props { locale: 'ko' | 'en'; }
+const { locale } = Astro.props;
+const en = locale === 'en';
+---
+<div class="diagram-viewport">
+  <svg class="model-diagram" viewBox="-0.5 -5 171 76" role="img" aria-label={en ? 'CLEAR-Net architecture: optical and SAR encoding, restoration and cloud components, bandwise mask blending' : 'CLEAR-Net 구조: 광학·SAR 인코딩, 복원용·구름 성분 분해, 밴드별 마스크 혼합'}>
+    <defs><marker id="clear-net-arrow" viewBox="0 0 8 8" refX="7.2" refY="4" markerUnits="userSpaceOnUse" markerWidth="1.9" markerHeight="1.9" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="arrow-head" /></marker></defs>
+    <path class="arrow original" marker-end="url(#clear-net-arrow)" d="M15,8 V2 H155 V29.6" />
+    <text class="detail" x="85" y="0.6" text-anchor="middle">{en ? 'Original optical image' : '원본 영상'}</text>
+    <rect class="box" x="0" y="8" width="30" height="14" rx="0.8" />
+    <rect class="box" x="0" y="52" width="30" height="14" rx="0.8" />
+    <rect class="box" x="34.5" y="8" width="30" height="14" rx="0.8" />
+    <rect class="box" x="34.5" y="52" width="30" height="14" rx="0.8" />
+    <rect class="box accent" x="70" y="8" width="30" height="14" rx="0.8" />
+    <rect class="box accent" x="70" y="30" width="30" height="14" rx="0.8" />
+    <rect class="box accent" x="105.5" y="8" width="30" height="14" rx="0.8" />
+    <rect class="box" x="105.5" y="52" width="30" height="14" rx="0.8" />
+    <rect class="box accent" x="140" y="30" width="30" height="14" rx="0.8" />
+    <path class="arrow" marker-end="url(#clear-net-arrow)" d="M30,13 H34.1" />
+    <path class="arrow" marker-end="url(#clear-net-arrow)" d="M30,59 H34.1" />
+    <path class="arrow" marker-end="url(#clear-net-arrow)" d="M15,52 V26 H32.2 V18 H34.1" />
+    <path class="arrow" marker-end="url(#clear-net-arrow)" d="M64.5,12 H69.6" />
+    <path class="arrow" marker-end="url(#clear-net-arrow)" d="M64.5,18 H67.2 V37 H69.6" />
+    <path class="arrow" marker-end="url(#clear-net-arrow)" d="M85,30 V22.4" />
+    <path class="arrow" marker-end="url(#clear-net-arrow)" d="M100,15 H105.1" />
+    <path class="arrow" marker-end="url(#clear-net-arrow)" d="M100,37 H102.7 V56 H105.1" />
+    <path class="arrow" marker-end="url(#clear-net-arrow)" d="M64.5,61 H105.1" />
+    <path class="arrow" marker-end="url(#clear-net-arrow)" d="M135.5,15 H137.7 V34 H139.6" />
+    <path class="arrow" marker-end="url(#clear-net-arrow)" d="M135.5,59 H137.7 V40 H139.6" />
+    <path class="arrow" marker-end="url(#clear-net-arrow)" d="M155,44 V49.6" />
+    <text class="label" x="2" y="13.8">{en ? 'Cloudy optical' : '구름 낀 광학 영상'}</text>
+    <text class="detail" x="2" y="18.8">{en ? 'S2, 13 bands' : 'Sentinel-2, 13밴드'}</text>
+    <text class="label" x="2" y="57.8">{en ? 'SAR image' : 'SAR 영상'}</text>
+    <text class="detail" x="2" y="62.8">{en ? 'S1, 2 channels' : 'Sentinel-1, 2채널'}</text>
+    <text class="label" x="36.5" y="13.8">{en ? 'Optical encoder' : '구름 영상 인코더'}</text>
+    <text class="detail" x="36.5" y="18.8">{en ? 'Optical + SAR input' : '광학 + SAR 입력'}</text>
+    <text class="label" x="36.5" y="57.8">{en ? 'SAR encoder' : 'SAR 인코더'}</text>
+    <text class="detail" x="36.5" y="62.8">{en ? 'SAR input only' : 'SAR만 입력'}</text>
+    <text class="label active" x="72" y="13.8">{en ? 'Cloud features' : '구름 성분 추출'}</text>
+    <text class="detail" x="72" y="18.8">{en ? 'Features − restored' : '특징 − 복원용 성분'}</text>
+    <text class="label active" x="72" y="35.8">{en ? 'Restoration' : '복원용 성분'}</text>
+    <text class="detail" x="72" y="40.8">{en ? 'Extracted first' : '먼저 추출'}</text>
+    <text class="label active" x="107.5" y="13.8">{en ? 'Bandwise masks' : '밴드별 마스크'}</text>
+    <text class="detail" x="107.5" y="18.8">{en ? '13 bandwise masks' : '13밴드 각각'}</text>
+    <text class="label" x="107.5" y="57.8">{en ? 'Decoder' : '복원 디코더'}</text>
+    <text class="detail" x="107.5" y="62.8">{en ? 'ACA-CRNet based' : 'ACA-CRNet 기반'}</text>
+    <text class="detail" x="106" y="49.6">{en ? 'Restoration + SAR' : '복원용 성분 + SAR 특징'}</text>
+    <text class="label active" x="142" y="35.8">{en ? 'Mask blending' : '마스크 혼합'}</text>
+    <text class="detail" x="142" y="40.8">{en ? 'Original ↔ restored' : '원본 ↔ 복원 영상'}</text>
+    <text class="label" x="155" y="54" text-anchor="middle">{en ? 'Output' : '최종 출력'}</text>
+  </svg>
+</div>

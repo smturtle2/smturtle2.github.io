@@ -1,0 +1,27 @@
+---
+interface Props { locale: 'ko' | 'en'; }
+const { locale } = Astro.props;
+const en = locale === 'en';
+---
+<div class="diagram-viewport">
+  <svg viewBox="-0.5 0 171 21" role="img" aria-label={en ? 'Article analysis: URL, Spring Boot collection, Python classification and sentence selection, GPT commentary, extension display' : '기사 분석: URL 전송, Spring Boot 본문 수집, Python 분류·문장 추출, GPT 해설, 확장 프로그램 표시'}>
+    <defs><marker id="clickbait-flow-arrow" viewBox="0 0 8 8" refX="7.2" refY="4" markerUnits="userSpaceOnUse" markerWidth="1.9" markerHeight="1.9" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="arrow-head" /></marker></defs>
+    <rect class="box" x="0" y=".5" width="30" height="20" rx=".8" />
+    <rect class="box" x="35" y=".5" width="30" height="20" rx=".8" />
+    <rect class="box accent" x="70" y=".5" width="30" height="20" rx=".8" />
+    <rect class="box" x="105" y=".5" width="30" height="20" rx=".8" />
+    <rect class="box accent" x="140" y=".5" width="30" height="20" rx=".8" />
+    <path class="arrow" marker-end="url(#clickbait-flow-arrow)" d="M30,10.5 H34.6" /><path class="arrow" marker-end="url(#clickbait-flow-arrow)" d="M65,10.5 H69.6" /><path class="arrow" marker-end="url(#clickbait-flow-arrow)" d="M100,10.5 H104.6" /><path class="arrow" marker-end="url(#clickbait-flow-arrow)" d="M135,10.5 H139.6" />
+    <text class="label" x="2.4" y="8.3">{en ? 'Send article URL' : 'URL 전송'}</text>
+    <text class="detail" x="2.4" y="15.7">{en ? 'Chrome extension' : 'Chrome 확장'}</text>
+    <text class="label" x="37.4" y="8.3">{en ? 'Collect article' : '본문 수집'}</text>
+    <text class="detail" x="37.4" y="15.7">Spring Boot</text>
+    <text class="label active" x="72.4" y={en ? '6.2' : '8.3'}>{en ? 'Classify / select' : '분류·문장 추출'}</text>
+    {en && <text class="label active" x="72.4" y="10.2">sentences</text>}
+    <text class="detail" x="72.4" y="15.7">{en ? 'Python inference' : 'Python 추론 서버'}</text>
+    <text class="label" x="107.4" y="8.3">{en ? 'Get commentary' : '해설 생성'}</text>
+    <text class="detail" x="107.4" y="15.7">GPT API</text>
+    <text class="label active" x="142.4" y="8.3">{en ? 'Display results' : '화면 표시'}</text>
+    <text class="detail" x="142.4" y="15.7">{en ? 'Chrome extension' : 'Chrome 확장'}</text>
+  </svg>
+</div>

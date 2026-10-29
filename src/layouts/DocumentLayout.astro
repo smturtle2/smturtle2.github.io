@@ -1,0 +1,10 @@
+---
+import SiteLayout from './SiteLayout.astro';
+import type { Locale } from '../i18n';
+import '../styles/documents.css';
+interface Props { locale: Locale; page: 'resume' | 'portfolio'; title: string; description: string; }
+const { locale, page, title, description } = Astro.props;
+---
+<SiteLayout locale={locale} page={page} title={title} description={description}>
+  <main class:list={['document', `document--${page}`]}><slot /></main>
+</SiteLayout>
