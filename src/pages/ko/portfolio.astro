@@ -1,112 +1,185 @@
 ---
 import { Image } from 'astro:assets';
 import DocumentLayout from '../../layouts/DocumentLayout.astro';
-import ClearNetDiagram from '../../components/documents/ClearNetDiagram.astro';
 import DataFlowDiagram from '../../components/documents/DataFlowDiagram.astro';
 import ClickbaitFlowDiagram from '../../components/documents/ClickbaitFlowDiagram.astro';
-import sceneBefore from '../../assets/portfolio/scene_before.jpg';
-import sceneMid from '../../assets/portfolio/scene_mid.jpg';
-import sceneAfter from '../../assets/portfolio/scene_after.jpg';
 import patch1 from '../../assets/portfolio/patch_1.jpg';
-import patch2 from '../../assets/portfolio/patch_2.jpg';
 import patch3 from '../../assets/portfolio/patch_3.jpg';
 import patch4 from '../../assets/portfolio/patch_4.jpg';
 import patch5 from '../../assets/portfolio/patch_5.jpg';
+import decomposition from '../../assets/portfolio/decomp.jpg';
 import seeker from '../../assets/portfolio/seeker.png';
-import hover from '../../assets/portfolio/hover.png';
+import sceneBefore from '../../assets/portfolio/scene_before.jpg';
+import sceneMid from '../../assets/portfolio/scene_mid.jpg';
+import sceneAfter from '../../assets/portfolio/scene_after.jpg';
+const blending = `prediction = cloudy * (1.0 - mask) + candidate * mask`;
 ---
-<DocumentLayout locale="ko" page="portfolio" title="신동주 포트폴리오" description="위성영상 복원 모델 CLEAR-Net과 낚시성 기사 분류 서비스 Click-bait Seeker의 설계와 구현.">
-  <section class="sheet overview">
+<DocumentLayout locale="ko" page="portfolio" title="신동주 포트폴리오" description="신동주의 위성영상 복원 모델, 공용 학습 환경, 기사 분류 서비스 개발 경험.">
+  <div class="sheet portfolio-sheet">
     <header class="portfolio-header">
       <div><h1>신동주</h1><p>Machine Learning Engineer</p></div>
       <address><a href="mailto:smturtle2@kakao.com">smturtle2@kakao.com</a><a href="https://github.com/smturtle2">github.com/smturtle2</a><a href="https://huggingface.co/Hermanni">huggingface.co/Hermanni</a></address>
     </header>
+  <article class="portfolio-project">
     <header class="project-header">
       <div class="row"><h2><span class="entry-title">CLEAR-Net</span><span class="entry-desc">SAR·광학 위성영상 구름 제거(Sentinel-1/2)</span></h2><p class="date">2026.03 ~ 2026.06</p></div>
-      <div class="row meta"><p class="context">동국대학교 종합설계1 · 4인 팀 · 최우수상</p><div class="links" aria-label="CLEAR-Net 관련 자료"><a href="https://github.com/smturtle2/cr-project">모델 코드</a><a href="https://huggingface.co/Hermanni/clear-net-sen12mscr">모델 가중치</a><a href="https://github.com/smturtle2/cr-train">학습 패키지</a><a href="https://huggingface.co/datasets/Hermanni/sen12mscr-v2">공개 데이터셋</a></div></div>
+      <div class="row meta"><p>동국대학교 종합설계1 · 4인 팀 · 최우수상</p><div class="links"><a href="https://github.com/smturtle2/cr-project">모델 코드</a><a href="https://huggingface.co/Hermanni/clear-net-sen12mscr">모델 가중치</a><a href="https://github.com/smturtle2/cr-train">학습 패키지</a><a href="https://huggingface.co/datasets/Hermanni/sen12mscr-v2">공개 데이터셋</a></div></div>
     </header>
-    <p class="lead">ACA-CRNet을 기준 모델로, 구름 없는 영역의 변경을 줄이기 위한 밴드별 마스크 혼합 구조 설계·구현</p>
-    <p>모델 설계·구현, 학습 데이터 재구성, 팀 공용 학습·평가 환경 담당</p>
-    <figure class="scene-strip">
-      <div><Image src={sceneBefore} alt="구름 낀 광학 영상 장면" loading="eager" /><p><strong>구름 낀 광학 영상</strong></p></div>
-      <div><Image src={sceneMid} alt="패치별 복원 결과가 일부 채워진 장면" loading="eager" /><p><strong>패치별 복원 진행</strong></p></div>
-      <div><Image src={sceneAfter} alt="CLEAR-Net 전체 장면 복원 결과" loading="eager" /><p><strong>전체 장면 복원 결과(검증 세트)</strong></p></div>
-    </figure>
-    <h3>후보 모델 비교를 위한 학습·평가 환경</h3>
-    <p>원본 389GB를 서버마다 받아 두기 어렵고, 스트리밍의 셔플 순서가 불안정해 실험 비교가 어려움</p>
-    <ol class="candidate-path">
-      <li><strong>parquet 스트리밍</strong><div><span>HF datasets로 바로 스트리밍 → 셔플 순서와 종료 처리가 불안정</span></div></li>
-      <li><strong>블록 캐시</strong><div><span>seed 기반 블록 선택으로 순서를 재현했으나 로컬 사본 필요</span></div></li>
-      <li><strong>압축 블록 포맷</strong><div><span>32장씩 zstd로 묶은 포맷으로 데이터셋을 다시 공개하고 블록 단위 스트리밍으로 교체</span></div></li>
-      <li class="final-candidate"><strong>분산 학습 대응</strong><div><span>GPU마다 다른 블록을 나눠 읽고 지표를 모아 기록</span></div></li>
-    </ol>
-    <figure class="diagram"><DataFlowDiagram locale="ko" /></figure>
-    <ul class="plain-list">
-      <li>데이터 선택·읽기 순서를 고정해 서버가 달라도 같은 데이터를 같은 순서로 학습</li>
-      <li>전처리·학습·평가·지표 기록을 <code>cr-train</code>으로 분리해 후보 4종을 같은 절차로 비교</li>
-      <li>팀원 코드 병합 후 지표 계산을 점검해 MAE만 다른 값 범위로 계산되던 문제 수정</li>
-    </ul>
-  </section>
-  <section class="sheet model-design">
-    <h2>모델 설계 과정</h2>
-    <p class="lead"><a href="https://arxiv.org/abs/2411.13042">ACA-CRNet</a>은 SAR·광학을 입력 단계에서 합쳐 영상 전체에 보정값을 더해 구름 없는 영역도 바뀔 수 있음 → 구름 영역 중심으로 복원하도록 마스크와 복원 후보를 분리</p>
-    <ol class="candidate-path">
-      <li><strong>LCR</strong><div><span>latent 공간의 local·global attention과 cross-attention으로 영상 결합</span></div></li>
-      <li><strong>FDT</strong><div><span>공통·고유 성분 분해, SSIM·CCC·CKA 손실 비교</span><span>영상 융합용 기준의 목적 차이와 13:2 채널 차이의 편향 가능성을 팀원과 검토</span></div></li>
-      <li><strong>FDT-CCA</strong><div><span>복원용·구름 성분 분해와 밴드별 마스크 혼합</span></div></li>
-      <li class="final-candidate"><strong>CLEAR-Net</strong><div><span>분해·마스크 구조를 단순화해 독립 모델로 구현</span></div></li>
-    </ol>
-    <h3>구름 성분 분리와 밴드별 마스크 혼합</h3>
-    <figure class="diagram model-diagram"><ClearNetDiagram locale="ko" /></figure>
-    <p class="formula">prediction = cloudy ⊙ (1 − mask) + candidate ⊙ mask</p>
-    <p>마스크가 0에 가까울수록 원본 비중 증가 · 최종 출력·복원 후보·보조 출력에 L1 + SSIM 적용</p>
-    <p>학습된 마스크이므로 구름 없는 모든 위치의 원본 보존을 보장하지 않음</p>
-  </section>
-  <section class="sheet evaluation">
-    <h2>복원 성능과 추론 효율</h2>
-    <h3>ACA-CRNet 대비 SSIM 개선 (0.8909 → 0.8936)</h3>
-    <div class="evaluation-overview"><table class="metrics">
-      <caption>SEN12MS-CR 테스트셋 7,899장</caption>
-      <thead><tr><th>모델</th><th>MAE ↓</th><th>PSNR ↑</th><th>SSIM ↑</th><th>SAM ↓</th></tr></thead>
-      <tbody><tr><th>ACA-CRNet</th><td><strong>0.0265</strong></td><td><strong>29.41</strong></td><td>0.8909</td><td><strong>7.910</strong></td></tr><tr><th>CLEAR-Net</th><td>0.0274</td><td>28.46</td><td class="accent"><strong>0.8936</strong></td><td>8.244</td></tr></tbody>
-    </table><figure class="inputs"><div><Image src={patch1} alt="구름 낀 광학 입력" loading="eager" /><p>광학 입력</p></div><div><Image src={patch2} alt="SAR 입력" loading="eager" /><p>SAR 입력</p></div></figure></div>
-    <figure class="patch-comparison">
+    <p class="lead">후보 모델 4종(LCR·FDT·<span class="model-name">FDT-CCA</span>·<span class="model-name">CLEAR-Net</span>) 설계·구현, 학습 데이터 재구성, 팀 공용 학습·평가 환경 구축 담당</p>
 
-      <div class="outputs"><div><Image src={patch3} alt="ACA-CRNet 결과" loading="eager" /><p>ACA-CRNet</p></div><div class="selected"><Image src={patch4} alt="CLEAR-Net 결과" loading="eager" /><p>CLEAR-Net</p></div><div><Image src={patch5} alt="정답 영상" loading="eager" /><p>정답</p></div></div>
-      <figcaption>제시한 예시에서는 ACA-CRNet보다 강과 길의 형태가 더 잘 드러나지만, 색은 정답보다 녹색에 가깝습니다.</figcaption>
-    </figure>
-    <p>SSIM은 개선됐으나 MAE·PSNR·SAM은 기준 모델에 미달. 구성 요소별 ablation과 마스크 품질 평가는 미수행</p>
-    <h3>SDPA로 contextual attention 재구현</h3>
-    <p>모든 위치 쌍의 attention 행렬을 한 번에 생성해 메모리가 위치 수의 제곱으로 증가 → PyTorch SDPA로 재구현해 최종 모델에도 적용</p>
-    <h4 class="measure-scope">특징 분해 실험 모델 · 추론</h4>
-    <div class="bars">
-      <div><h4>VRAM ↓</h4><div class="bar-row"><span>교체 전</span><div class="track" style="--value:72%"><div class="bar"></div><span class="value">6,264 MB</span></div></div><div class="bar-row"><span>교체 후</span><div class="track" style="--value:8.32%"><div class="bar after"></div><span class="value">724 MB</span></div></div></div>
-      <div><h4>처리량 ↑</h4><div class="bar-row"><span>교체 전</span><div class="track" style="--value:42.31%"><div class="bar"></div><span class="value">4.63 img/s</span></div></div><div class="bar-row"><span>교체 후</span><div class="track" style="--value:72%"><div class="bar after"></div><span class="value">7.88 img/s</span></div></div></div>
-    </div>
-  </section>
-  <section class="sheet clickbait">
+    <section>
+      <h3>데이터셋 재구성과 재현 가능한 스트리밍 학습</h3>
+      <ul class="work-list">
+        <li>원본 389GB가 장면별 parquet 파일 177개(평균 2.2GB)로 나뉘어 있어, 서버마다 전체를 보관하거나 필요한 샘플만 골라 받기 어려움</li>
+      </ul>
+      <table class="decision-table">
+        <thead><tr><th>방식</th><th>데이터 선택·읽기 순서</th><th>로컬 저장</th></tr></thead>
+        <tbody>
+          <tr><th>parquet 직접 스트리밍</th><td>셔플·종료 처리 불안정</td><td>전체 사본 불필요</td></tr>
+          <tr><th>seed 기반 블록 캐시</th><td>선택한 데이터와 순서 재현</td><td>로컬 사본 필요</td></tr>
+          <tr class="chosen"><th>압축 블록 스트리밍</th><td>seed로 선택·순서 고정, GPU별 분할</td><td>약 5GB, 사용한 블록 삭제</td></tr>
+        </tbody>
+      </table>
+      <ul class="work-list">
+        <li>32장씩 zstd로 압축한 <code>.crpack</code> 형식 설계, 전체 용량을 389GB에서 240GB로 줄여 공개</li>
+        <li>다음 블록을 미리 받는 로더와 일시적인 다운로드 오류 재시도 구현</li>
+      </ul>
+      <figure class="diagram"><DataFlowDiagram locale="ko" /></figure>
+    </section>
+
+    <section>
+      <h3>개별 실험과 공용 학습 코드의 분리</h3>
+      <ul class="work-list">
+        <li>팀원들의 코딩 에이전트가 공용 코드까지 수정하면 다른 실험의 학습 조건도 바뀔 수 있어, 전처리·학습·평가 코드를 <code>cr-train</code>으로 분리</li>
+        <li>모델 저장소 <code>cr-project</code>에서는 패키지를 설치해 사용하고, 공용 코드 변경은 main 브랜치에서 직접 관리</li>
+
+        <li>cr-train에 데이터 로딩, DDP 학습·검증·테스트, 체크포인트 저장과 지표 기록 통합</li>
+        <li>공용 실행 스크립트는 main에서만 커밋하도록 훅을 적용하고, 모델·손실 함수·옵티마이저·학습 설정을 바꾸는 개인 스크립트는 Git 관리 대상에서 제외</li>
+
+        <li>후보 모델 4종을 같은 학습·평가 절차로 비교</li>
+        <li>팀원 코드를 합친 뒤 결과를 점검해 MAE만 다른 값 범위로 계산되던 문제 수정</li>
+      </ul>
+    </section>
+
+    <section class="page-start">
+      <h3>구름 없는 영역을 보존하기 위한 특징 분해와 마스크 혼합</h3>
+      <ul class="work-list">
+        <li>ACA-CRNet은 영상 전체에 보정값을 더해 구름 없는 영역도 바뀔 수 있어, 복원할 내용과 원본을 남길 비중을 분리하는 구조 설계</li>
+
+      </ul>
+      <table class="candidate-table"><thead><tr><th>후보</th><th>실험한 구조와 변경 내용</th></tr></thead><tbody>
+        <tr><th>LCR</th><td>잠재 공간의 local·global attention과 cross-attention 결합 실험</td></tr>
+        <tr><th>FDT</th><td>SAR·광학의 공통·고유 성분 분해, SSIM·CCC·CKA 손실 비교. 센서 공통성 기준과 복원 역할의 불일치, 13:2 채널 차이의 편향 가능성 검토</td></tr>
+        <tr><th>FDT-CCA</th><td>복원용·구름 성분으로 분해 기준 변경, 밴드별 마스크 혼합 도입</td></tr>
+        <tr class="chosen"><th>CLEAR-Net</th><td>독립 모델로 재작성, 구름 성분 추출·마스크 패턴 혼합·보조 출력 학습 구성</td></tr>
+      </tbody></table>
+      <figure class="decomposition-figure"><Image src={decomposition} alt="모델 내부 특징을 구름 성분과 복원용 성분으로 나누고 마스크와 복원 후보를 생성한 시각화" loading="eager" /><figcaption>모델 내부 특징의 분해와 마스크·복원 후보 생성 과정</figcaption></figure>
+      <ul class="work-list">
+        <li>복원용 성분을 먼저 추출하고 남은 특징에서 구름 성분을 추출한 뒤, 복원용 성분과 SAR 전용 경로의 특징으로 복원 후보 생성</li>
+        <li>구름 성분에서 구한 64개 패턴의 가중치로 13개 밴드의 혼합 마스크 생성</li>
+      </ul>
+      <p class="model-equation"><a href="https://github.com/smturtle2/cr-project/blob/decdb3342954d21ea8132efd6722b04fc33050f4/modules/model/CLEAR_Net/clear_net.py#L140"><code>{blending}</code></a></p>
+      <ul class="work-list">
+        <li>최종 출력·복원 후보·보조 출력에 L1+SSIM 손실을 적용하고, 마스크 가중치가 일부 패턴에 몰리지 않도록 균형 손실 추가</li>
+      </ul>
+    </section>
+
+
+    <section>
+      <h3>attention 행렬의 메모리 사용을 줄인 SDPA 구현</h3>
+      <div class="runtime-result">
+      <ul class="work-list">
+        <li>특징 분해 실험 모델이 모든 위치 쌍의 attention 행렬을 저장해 추론 VRAM 6GB 초과</li>
+        <li>위치 수의 제곱으로 커지는 저장 비용을 줄이도록 PyTorch SDPA로 재구현하고 최종 CLEAR-Net에도 적용</li>
+      </ul>
+      <table class="compact-metrics"><caption>추론 측정값 (종합설계보고서)</caption><thead><tr><th>모델</th><th>VRAM</th><th>처리량</th></tr></thead><tbody><tr><th>EMRDM (Diffusion)</th><td>2,782 MB</td><td>1.28 img/s</td></tr><tr><th>특징 분해 · 기존</th><td>6,264 MB</td><td>4.63 img/s</td></tr><tr><th>특징 분해 · SDPA</th><td><strong>724 MB</strong></td><td><strong>7.88 img/s</strong></td></tr></tbody></table>
+      </div>
+    </section>
+
+    <section class="evaluation-account page-start">
+      <h3>학습과 테스트 결과</h3>
+      <ul class="work-list">
+        <li>A6000 4장 DDP·bf16, 120 epoch(약 76시간) 학습</li>
+        <li>SEN12MS-CR 테스트셋 7,899장에서 ACA-CRNet과 복원 품질 비교</li>
+      </ul>
+      <table class="metrics">
+        <thead><tr><th>모델</th><th>MAE ↓</th><th>PSNR ↑</th><th>SSIM ↑</th><th>SAM ↓</th></tr></thead>
+        <tbody><tr><th>ACA-CRNet</th><td><strong>0.0265</strong></td><td><strong>29.41</strong></td><td>0.8909</td><td><strong>7.910</strong></td></tr><tr><th>CLEAR-Net</th><td>0.0274</td><td>28.46</td><td class="accent"><strong>0.8936</strong></td><td>8.244</td></tr></tbody>
+      </table>
+      <figure class="restoration-comparison">
+        <div><Image src={patch1} alt="구름 낀 광학 입력" loading="eager" /><p>광학 입력</p></div>
+        <div><Image src={patch3} alt="ACA-CRNet 복원 결과" loading="eager" /><p>ACA-CRNet</p></div>
+        <div class="selected"><Image src={patch4} alt="CLEAR-Net 복원 결과" loading="eager" /><p>CLEAR-Net</p></div>
+        <div><Image src={patch5} alt="정답 영상" loading="eager" /><p>정답</p></div>
+        <figcaption>ACA-CRNet보다 강과 길의 형태는 뚜렷하지만, 정답보다 녹색이 강하게 나타난 CLEAR-Net 결과</figcaption>
+      </figure>
+      <ul class="work-list">
+        <li>SSIM 소폭 개선, MAE·PSNR·SAM은 기준 모델에 미달</li>
+        <li>구름 없는 영역만의 보존 성능과 구성 요소별 효과는 별도 검증하지 않음</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>장면 단위 추론 데모</h3>
+
+      <ul class="work-list"><li>검증 장면의 784개 패치를 차례로 복원하고 진행 상황을 웹 화면에 표시하는 <a href="https://github.com/smturtle2/cr-project/blob/main/modules/util/clear_net_scene_demo.py">Python 추론 데모</a> 제작</li></ul>
+      <figure class="scene-sequence">
+        <div><Image src={sceneBefore} alt="구름이 있는 입력 장면" loading="eager" /><p>입력 장면</p></div>
+        <div><Image src={sceneMid} alt="패치별 복원이 진행 중인 장면" loading="eager" /><p>패치별 복원 진행</p></div>
+        <div><Image src={sceneAfter} alt="전체 패치의 추론을 마친 장면" loading="eager" /><p>전체 장면 출력</p></div>
+      </figure>
+    </section>
+  </article>
+
+  <article class="portfolio-project">
     <header class="project-header">
       <div class="row"><h2><span class="entry-title">Click-bait Seeker</span><span class="entry-desc">낚시성 기사 분류 Chrome 확장 프로그램</span></h2><p class="date">2024.09 ~ 2024.12</p></div>
-      <div class="row meta"><p class="context">동국대학교 공개SW프로젝트 · 4인 팀</p><div class="links" aria-label="Click-bait Seeker 관련 자료"><a href="https://github.com/CSID-DGU/2024-02-CSC4004-2-2-NewEngineeringCenterGhost">프로젝트 코드</a><a href="https://chromewebstore.google.com/detail/blcclfjholbpgmmbnghodhlkagepjbbh">Chrome 웹 스토어</a></div></div>
+      <div class="row meta"><p>동국대학교 공개SW프로젝트 · 4인 팀</p><div class="links"><a href="https://github.com/CSID-DGU/2024-02-CSC4004-2-2-NewEngineeringCenterGhost">프로젝트 코드</a><a href="https://chromewebstore.google.com/detail/blcclfjholbpgmmbnghodhlkagepjbbh">Chrome 웹 스토어</a></div></div>
     </header>
-    <p class="lead">AI Hub 낚시성 기사 약 73만 건으로 분류 모델 학습, 모델이 주목한 주요 문장을 기사 화면에 표시</p>
-    <p>전처리·모델 학습, 주요 문장 추출, Python 추론 서버, 확장 프로그램 결과·GPT 해설 표시 담당</p>
-    <figure class="shots"><div><Image src={seeker} alt="분류 확률과 GPT 해설, 주요 문장 강조를 보여 주는 기사 분석 화면" loading="eager" format="png" /><p>기사 분석: 확률·GPT 해설과 주요 문장 강조</p></div><div><Image src={hover} alt="링크에 마우스를 올렸을 때 낚시성 확률 표시" loading="eager" format="png" /><p>링크에 마우스를 올리면 확률 표시</p></div></figure>
-    <figure class="diagram"><ClickbaitFlowDiagram locale="ko" /></figure>
-    <p>팀원이 구현한 Spring Boot 서버와 Python 추론 서버 연동</p>
-    <div class="two-columns">
-      <section><h3>자모 단위 FastText</h3><p>오탈자 대응을 위해 별도 한국어 코퍼스로 임베딩을 학습하고 Transformer 분류 모델의 입력으로 사용</p>
-        <table class="typo"><thead><tr><th>오타</th><th>분해 없이</th><th>자모 분해</th></tr></thead><tbody><tr><th>스맡폰</th><td>이 · 증기</td><td><strong>스마트 · 스마트폰</strong></td></tr><tr><th>ㅏㅣ폰</th><td>매료 · 베이지</td><td><strong>아이폰</strong> · 폰</td></tr><tr><th>햄벅</th><td>해질 · 낙관</td><td><strong>햄버거</strong> · 핫도그</td></tr></tbody></table>
-      </section>
-      <section><h3>주요 문장 추출·강조</h3>
-        <ul class="plain-list">
-          <li>PyTorch Transformer 기반 분류 모델이 층별 attention을 반환하도록 수정</li>
-          <li>attention 점수가 높은 토큰이 속한 문장 추출</li>
-          <li>마지막 층만 사용하는 방식과 층별 attention 결합(rollout)의 추출 문장을 직접 비교해 rollout 적용</li>
-          <li>형태소를 이어 붙인 문장과 공백을 제거한 본문을 대조해 강조 위치 탐색</li>
-          <li>문장별 정답이 없어 정량 평가는 미수행. attention은 분류 판단의 원인을 증명하지 않음</li>
-        </ul>
-      </section>
-    </div>
-  </section>
+    <ul class="work-list project-scope">
+      <li>링크 hover로 확률 확인, 페이지 전체·선택한 텍스트/이미지 분석에서 확률·GPT 해설 표시</li>
+      <li>데이터 전처리·분류 모델 학습·문장 추출·Python 추론 서버를 담당하고, 후반에는 확장 프로그램의 결과 표시도 맡음</li>
+    </ul>
+      <figure class="product-screen"><Image src={seeker} alt="기사 상단에 낚시성 확률과 GPT 해설을 표시한 확장 프로그램 화면" loading="eager" format="png" /><figcaption>낚시성 확률·GPT 해설 배너와 본문 강조 표시</figcaption></figure>
+
+    <section class="input-account">
+      <h3>긴 기사와 오탈자를 고려한 입력 구성</h3>
+      <ul class="work-list">
+        <li>AI Hub 기사 약 73만 건의 제목·부제·본문 문장을 SEP로 연결, 최대 3,584토큰 입력 구성</li>
+        <li>낚시성·비낚시성 약 1:1, 학습·검증·테스트를 9:0.5:0.5로 층화 분할</li>
+        <li>샘플당 약 3.5MB인 임베딩을 미리 저장하지 않고 학습 중 변환</li>
+        <li>8층 Transformer(d=256, 4 heads)의 [CLS] 출력으로 낚시성 확률 계산</li>
+
+        <li>오탈자에서도 유사한 단어 표현을 얻도록 별도 한국어 코퍼스로 자모 단위 FastText 학습</li>
+      </ul>
+      <table class="typo"><caption>자모 분해 전후의 최근접 단어와 코사인 유사도</caption><thead><tr><th>입력</th><th>자모 분해 없이</th><th>자모 분해 후</th></tr></thead><tbody><tr><th>스맡폰</th><td>이 0.20 · 증기 0.20</td><td><strong>스마트 0.84 · 스마트폰 0.81</strong></td></tr><tr><th>ㅏㅣ폰</th><td>매료 0.19 · 베이지 0.18</td><td><strong>아이폰 0.83</strong> · 폰 0.81</td></tr><tr><th>햄벅</th><td>해질 0.21 · 낙관 0.20</td><td><strong>햄버거 0.86</strong> · 핫도그 0.68</td></tr></tbody></table>
+    </section>
+
+    <section class="page-start">
+      <h3>문장 라벨 없이 주요 문장 추출</h3>
+      <ul class="work-list">
+        <li>문장별 정답이 없는 조건에서 모델의 attention을 활용하도록 PyTorch TransformerEncoder를 수정해 층별 attention 반환</li>
+        <li>마지막 층만 쓰는 방식과 attention rollout이 고른 문장을 직접 읽어 비교한 뒤 rollout 채택</li>
+      </ul>
+      <ol class="attention-steps" aria-label="주요 문장 선정 과정"><li>층별 attention 추출</li><li>잔차 반영·행 정규화</li><li>층별 행렬 곱</li><li>점수 높은 토큰 선택</li><li>해당 문장 반환</li></ol>
+      <ul class="work-list">
+        <li>점수가 높은 토큰(z &gt; 1.96)이 속한 문장을 반환하되, 본문을 과도하게 강조하지 않도록 토큰은 최대 5개로 제한</li>
+        <li>문장 단위 정량 평가는 진행하지 않음</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>추론 서버와 확장 프로그램 연동</h3>
+      <ul class="work-list">
+        <li>11월 말까지 서버 결과 대신 임의 확률을 표시하던 확장 프로그램의 연동 작업을 이어받아 진행</li>
+        <li>코딩 에이전트로 기존 프런트엔드를 파악하고, 링크별 결과 캐시·요청 대기열·중복 URL 요청 방지 구현</li>
+
+        <li>요청마다 모델을 다시 불러오지 않도록 Python 추론 프로세스에 모델을 상주시킨 뒤, Unix 소켓으로 연결한 요청 헬퍼에서 입력 전달</li>
+        <li>띄어쓰기가 사라진 추출 문장을 찾도록 공백을 제거한 뒤, 최장 공통 부분 문자열(LCS)로 본문 텍스트 노드에서 위치를 찾는 강조 함수 구현</li>
+        <li>팀원의 Spring Boot 서버와 연동해 확률·GPT 해설 표시를 구현하고, 팀에서 Chrome 웹 스토어에 배포</li>
+      </ul>
+      <figure class="diagram"><ClickbaitFlowDiagram locale="ko" /></figure>
+    </section>
+  </article>
+  </div>
 </DocumentLayout>

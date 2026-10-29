@@ -1,112 +1,185 @@
 ---
 import { Image } from 'astro:assets';
 import DocumentLayout from '../../layouts/DocumentLayout.astro';
-import ClearNetDiagram from '../../components/documents/ClearNetDiagram.astro';
 import DataFlowDiagram from '../../components/documents/DataFlowDiagram.astro';
 import ClickbaitFlowDiagram from '../../components/documents/ClickbaitFlowDiagram.astro';
-import sceneBefore from '../../assets/portfolio/scene_before.jpg';
-import sceneMid from '../../assets/portfolio/scene_mid.jpg';
-import sceneAfter from '../../assets/portfolio/scene_after.jpg';
 import patch1 from '../../assets/portfolio/patch_1.jpg';
-import patch2 from '../../assets/portfolio/patch_2.jpg';
 import patch3 from '../../assets/portfolio/patch_3.jpg';
 import patch4 from '../../assets/portfolio/patch_4.jpg';
 import patch5 from '../../assets/portfolio/patch_5.jpg';
+import decomposition from '../../assets/portfolio/decomp.jpg';
 import seeker from '../../assets/portfolio/seeker.png';
-import hover from '../../assets/portfolio/hover.png';
+import sceneBefore from '../../assets/portfolio/scene_before.jpg';
+import sceneMid from '../../assets/portfolio/scene_mid.jpg';
+import sceneAfter from '../../assets/portfolio/scene_after.jpg';
+const blending = `prediction = cloudy * (1.0 - mask) + candidate * mask`;
 ---
-<DocumentLayout locale="en" page="portfolio" title="SHIN DONGJU Portfolio" description="Design and implementation of CLEAR-Net for satellite image restoration and Click-bait Seeker for clickbait classification.">
-  <section class="sheet overview">
+<DocumentLayout locale="en" page="portfolio" title="SHIN DONGJU Portfolio" description="SHIN DONGJU's work on satellite image restoration models, shared training tools, and an article classification service.">
+  <div class="sheet portfolio-sheet">
     <header class="portfolio-header">
       <div><h1>SHIN DONGJU</h1><p>Machine Learning Engineer</p></div>
       <address><a href="mailto:smturtle2@kakao.com">smturtle2@kakao.com</a><a href="https://github.com/smturtle2">github.com/smturtle2</a><a href="https://huggingface.co/Hermanni">huggingface.co/Hermanni</a></address>
     </header>
+  <article class="portfolio-project">
     <header class="project-header">
-      <div class="row"><h2><span class="entry-title">CLEAR-Net</span><span class="entry-desc">SAR-optical satellite cloud removal (Sentinel-1/2)</span></h2><p class="date">Mar 2026 – Jun 2026</p></div>
-      <div class="row meta"><p class="context">Dongguk University Capstone Design 1 · Team of 4 · Excellence Award</p><div class="links" aria-label="CLEAR-Net resources"><a href="https://github.com/smturtle2/cr-project">Model code</a><a href="https://huggingface.co/Hermanni/clear-net-sen12mscr">Weights</a><a href="https://github.com/smturtle2/cr-train">Training package</a><a href="https://huggingface.co/datasets/Hermanni/sen12mscr-v2">Dataset</a></div></div>
+      <div class="row"><h2><span class="entry-title">CLEAR-Net</span><span class="entry-desc">SAR–optical satellite cloud removal (Sentinel-1/2)</span></h2><p class="date">Mar 2026 – Jun 2026</p></div>
+      <div class="row meta"><p>Dongguk University Capstone Design 1 · Team of 4 · Excellence Award</p><div class="links"><a href="https://github.com/smturtle2/cr-project">Model code</a><a href="https://huggingface.co/Hermanni/clear-net-sen12mscr">Model weights</a><a href="https://github.com/smturtle2/cr-train">Training package</a><a href="https://huggingface.co/datasets/Hermanni/sen12mscr-v2">Public dataset</a></div></div>
     </header>
-    <p class="lead">ACA-CRNet-based bandwise blending to limit changes in cloud-free areas</p>
-    <p>Model design and implementation, data restructuring, and shared training/evaluation tools</p>
-    <figure class="scene-strip">
-      <div><Image src={sceneBefore} alt="Cloudy optical image scene" loading="eager" /><p><strong>Cloudy optical image</strong></p></div>
-      <div><Image src={sceneMid} alt="Scene partially filled with restored patches" loading="eager" /><p><strong>Patchwise restoration</strong></p></div>
-      <div><Image src={sceneAfter} alt="Full-scene restoration by CLEAR-Net" loading="eager" /><p><strong>Restored scene (validation set)</strong></p></div>
-    </figure>
-    <h3>Training and evaluation for model comparison</h3>
-    <p>389 GB per server was impractical, and streamed shuffle order was unstable</p>
-    <ol class="candidate-path">
-      <li><strong>Parquet streaming</strong><div><span>Direct HF datasets streaming → unstable shuffle order and termination</span></div></li>
-      <li><strong>Block cache</strong><div><span>Seeded block selection made order reproducible but required a local copy</span></div></li>
-      <li><strong>Block format</strong><div><span>Republished data in zstd blocks of 32 samples; switched to block streaming</span></div></li>
-      <li class="final-candidate"><strong>Multi-GPU</strong><div><span>Assigned separate blocks to GPUs and collected metrics</span></div></li>
-    </ol>
-    <figure class="diagram"><DataFlowDiagram locale="en" /></figure>
-    <ul class="plain-list">
-      <li>Fixed sample selection and order across training servers</li>
-      <li>Unified four-model comparison in <code>cr-train</code>: preprocessing, training, evaluation, metrics</li>
-      <li>Corrected MAE’s inconsistent value range when merging teammates’ metric code</li>
-    </ul>
-  </section>
-  <section class="sheet model-design">
-    <h2>Model design</h2>
-    <p class="lead"><a href="https://arxiv.org/abs/2411.13042">ACA-CRNet</a> fuses SAR and optical inputs and adds a residual across the image, potentially changing cloud-free areas → separated the mask from the restoration candidate to focus on cloudy areas</p>
-    <ol class="candidate-path">
-      <li><strong>LCR</strong><div><span>Fused images with local/global attention and cross-attention in latent space</span></div></li>
-      <li><strong>FDT</strong><div><span>Separated common and unique features; compared SSIM, CCC, and CKA losses</span><span>Discussed with teammates the mismatch with cloud removal and possible bias from the 13:2 channel imbalance</span></div></li>
-      <li><strong>FDT-CCA</strong><div><span>Separated restoration and cloud components; blended images with bandwise masks</span></div></li>
-      <li class="final-candidate"><strong>CLEAR-Net</strong><div><span>Simplified decomposition and masking into a standalone model</span></div></li>
-    </ol>
-    <h3>Cloud decomposition and bandwise mask blending</h3>
-    <figure class="diagram model-diagram"><ClearNetDiagram locale="en" /></figure>
-    <p class="formula">prediction = cloudy ⊙ (1 − mask) + candidate ⊙ mask</p>
-    <p>Masks closer to 0 retain more of the original · L1 + SSIM on the final, candidate, and auxiliary outputs</p>
-    <p>Learned masks do not guarantee preservation of every cloud-free pixel</p>
-  </section>
-  <section class="sheet evaluation">
-    <h2>Restoration quality and inference efficiency</h2>
-    <h3>SSIM improvement over ACA-CRNet (0.8909 → 0.8936)</h3>
-    <div class="evaluation-overview"><table class="metrics">
-      <caption>SEN12MS-CR test set: 7,899 images</caption>
-      <thead><tr><th>Model</th><th>MAE ↓</th><th>PSNR ↑</th><th>SSIM ↑</th><th>SAM ↓</th></tr></thead>
-      <tbody><tr><th>ACA-CRNet</th><td><strong>0.0265</strong></td><td><strong>29.41</strong></td><td>0.8909</td><td><strong>7.910</strong></td></tr><tr><th>CLEAR-Net</th><td>0.0274</td><td>28.46</td><td class="accent"><strong>0.8936</strong></td><td>8.244</td></tr></tbody>
-    </table><figure class="inputs"><div><Image src={patch1} alt="Cloudy optical input" loading="eager" /><p>Optical input</p></div><div><Image src={patch2} alt="SAR input" loading="eager" /><p>SAR input</p></div></figure></div>
-    <figure class="patch-comparison">
+    <p class="lead">Designed and implemented four candidate models (LCR, FDT, <span class="model-name">FDT-CCA</span>, and <span class="model-name">CLEAR-Net</span>), restructured the training data, and built the team's shared training and evaluation environment</p>
 
-      <div class="outputs"><div><Image src={patch3} alt="ACA-CRNet result" loading="eager" /><p>ACA-CRNet</p></div><div class="selected"><Image src={patch4} alt="CLEAR-Net result" loading="eager" /><p>CLEAR-Net</p></div><div><Image src={patch5} alt="Ground-truth image" loading="eager" /><p>Ground truth</p></div></div>
-      <figcaption>In this example, rivers and roads are clearer than with ACA-CRNet, but the colors are greener than the ground truth.</figcaption>
-    </figure>
-    <p>SSIM improved; MAE, PSNR, and SAM fell short of the baseline. No component ablations or mask-quality evaluation</p>
-    <h3>Reimplementing contextual attention with SDPA</h3>
-    <p>Materializing attention for all position pairs caused quadratic memory growth → reimplemented with PyTorch SDPA and applied it to the final model</p>
-    <h4 class="measure-scope">Feature-decomposition experimental model · Inference</h4>
-    <div class="bars">
-      <div><h4>VRAM ↓</h4><div class="bar-row"><span>Before</span><div class="track" style="--value:72%"><div class="bar"></div><span class="value">6,264 MB</span></div></div><div class="bar-row"><span>After</span><div class="track" style="--value:8.32%"><div class="bar after"></div><span class="value">724 MB</span></div></div></div>
-      <div><h4>Throughput ↑</h4><div class="bar-row"><span>Before</span><div class="track" style="--value:42.31%"><div class="bar"></div><span class="value">4.63 img/s</span></div></div><div class="bar-row"><span>After</span><div class="track" style="--value:72%"><div class="bar after"></div><span class="value">7.88 img/s</span></div></div></div>
-    </div>
-  </section>
-  <section class="sheet clickbait">
+    <section>
+      <h3>Restructuring the dataset for reproducible streaming</h3>
+      <ul class="work-list">
+        <li>389GB in 177 scene-level parquet files (~2.2GB each), making per-server copies and selective downloads difficult</li>
+      </ul>
+      <table class="decision-table">
+        <thead><tr><th>Approach</th><th>Data selection and reading order</th><th>Local storage</th></tr></thead>
+        <tbody>
+          <tr><th>Direct parquet streaming</th><td>Unstable shuffling and termination</td><td>No full copy needed</td></tr>
+          <tr><th>Seeded block cache</th><td>Repeatable selection and order</td><td>Local copy required</td></tr>
+          <tr class="chosen"><th>Compressed block streaming</th><td>Seeded selection and order, split by GPU</td><td>~5GB; used blocks deleted</td></tr>
+        </tbody>
+      </table>
+      <ul class="work-list">
+        <li>Created 32-image zstd <code>.crpack</code> blocks; republished the dataset at 240GB, down from 389GB</li>
+        <li>Implemented block prefetching and retries for temporary download failures</li>
+      </ul>
+      <figure class="diagram"><DataFlowDiagram locale="en" /></figure>
+    </section>
+
+    <section>
+      <h3>Separating experiments from shared training code</h3>
+      <ul class="work-list">
+        <li>Separated preprocessing, training and evaluation into <code>cr-train</code> so coding-agent edits would not change teammates' experiment conditions</li>
+        <li>Made <code>cr-project</code> consume the package; owned shared-code changes on main</li>
+
+        <li>Centralized data loading, DDP, training/validation/testing, checkpoints and metric logging</li>
+        <li>Restricted shared-runner commits to main; kept model/loss/optimizer/settings changes in Git-ignored personal scripts</li>
+
+        <li>Compared four candidate models using the same training and evaluation procedure</li>
+        <li>Fixed MAE's inconsistent value range after merging teammates' code</li>
+      </ul>
+    </section>
+
+    <section class="page-start">
+      <h3>Feature decomposition and mask blending for cloud-free areas</h3>
+      <ul class="work-list">
+        <li>Separated restoration from original-input blending to avoid ACA-CRNet's whole-image residual altering cloud-free areas</li>
+
+      </ul>
+      <table class="candidate-table"><thead><tr><th>Candidate</th><th>Architecture explored and changes</th></tr></thead><tbody>
+        <tr><th>LCR</th><td>Latent local/global attention with cross-attention fusion</td></tr>
+        <tr><th>FDT</th><td>Shared/unique SAR–optical features; SSIM/CCC/CKA losses. Questioned restoration roles and possible 13:2 channel bias</td></tr>
+        <tr><th>FDT-CCA</th><td>Restoration/cloud decomposition with bandwise mask blending</td></tr>
+        <tr class="chosen"><th>CLEAR-Net</th><td>Cloud extractor, mask router and auxiliary loss in a standalone model</td></tr>
+      </tbody></table>
+      <figure class="decomposition-figure"><Image src={decomposition} alt="Visualization of internal model features split into cloud and restoration components to generate a mask and restoration candidate" loading="eager" /><figcaption>Feature decomposition and mask/candidate generation</figcaption></figure>
+      <ul class="work-list">
+        <li>Extracted restoration features first, then cloud features from the remainder; combined restoration and dedicated SAR features into a candidate</li>
+        <li>Weighted 64 patterns from cloud features to generate 13-band blending masks</li>
+      </ul>
+      <p class="model-equation"><a href="https://github.com/smturtle2/cr-project/blob/decdb3342954d21ea8132efd6722b04fc33050f4/modules/model/CLEAR_Net/clear_net.py#L140"><code>{blending}</code></a></p>
+      <ul class="work-list">
+        <li>Applied L1+SSIM to final/candidate/auxiliary outputs and a balancing loss against mask weights concentrating on a few patterns</li>
+      </ul>
+    </section>
+
+
+    <section>
+      <h3>Reducing attention memory use with SDPA</h3>
+      <div class="runtime-result">
+      <ul class="work-list">
+        <li>All-pairs attention storage drove inference VRAM above 6GB in the feature-decomposition experiment</li>
+        <li>Reimplemented with PyTorch SDPA to reduce quadratic storage cost; reused the implementation in CLEAR-Net</li>
+      </ul>
+      <table class="compact-metrics"><caption>Inference measurements (project report)</caption><thead><tr><th>Model</th><th>VRAM</th><th>Throughput</th></tr></thead><tbody><tr><th>EMRDM (Diffusion)</th><td>2,782 MB</td><td>1.28 img/s</td></tr><tr><th>Feature decomp. · Original</th><td>6,264 MB</td><td>4.63 img/s</td></tr><tr><th>Feature decomp. · SDPA</th><td><strong>724 MB</strong></td><td><strong>7.88 img/s</strong></td></tr></tbody></table>
+      </div>
+    </section>
+
+    <section class="evaluation-account page-start">
+      <h3>Training and test results</h3>
+      <ul class="work-list">
+        <li>Trained for 120 epochs (approximately 76 hours) on four A6000 GPUs using DDP and bf16</li>
+        <li>Compared restoration quality against ACA-CRNet on 7,899 images from the SEN12MS-CR test set</li>
+      </ul>
+      <table class="metrics">
+        <thead><tr><th>Model</th><th>MAE ↓</th><th>PSNR ↑</th><th>SSIM ↑</th><th>SAM ↓</th></tr></thead>
+        <tbody><tr><th>ACA-CRNet</th><td><strong>0.0265</strong></td><td><strong>29.41</strong></td><td>0.8909</td><td><strong>7.910</strong></td></tr><tr><th>CLEAR-Net</th><td>0.0274</td><td>28.46</td><td class="accent"><strong>0.8936</strong></td><td>8.244</td></tr></tbody>
+      </table>
+      <figure class="restoration-comparison">
+        <div><Image src={patch1} alt="Cloudy optical input" loading="eager" /><p>Optical input</p></div>
+        <div><Image src={patch3} alt="ACA-CRNet restoration result" loading="eager" /><p>ACA-CRNet</p></div>
+        <div class="selected"><Image src={patch4} alt="CLEAR-Net restoration result" loading="eager" /><p>CLEAR-Net</p></div>
+        <div><Image src={patch5} alt="Ground-truth image" loading="eager" /><p>Ground truth</p></div>
+        <figcaption>CLEAR-Net result with clearer river and road shapes than ACA-CRNet, but greener colors than the ground truth</figcaption>
+      </figure>
+      <ul class="work-list">
+        <li>Slight SSIM improvement; weaker MAE, PSNR, and SAM results than the baseline</li>
+        <li>No separate evaluation of cloud-free-area preservation or individual component effects</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>Full-scene inference demo</h3>
+
+      <ul class="work-list"><li>Built a <a href="https://github.com/smturtle2/cr-project/blob/main/modules/util/clear_net_scene_demo.py">Python inference demo</a> that restores a validation scene's 784 patches sequentially and displays progress in a browser</li></ul>
+      <figure class="scene-sequence">
+        <div><Image src={sceneBefore} alt="Cloudy input scene" loading="eager" /><p>Input scene</p></div>
+        <div><Image src={sceneMid} alt="Scene restoration in progress patch by patch" loading="eager" /><p>Patchwise progress</p></div>
+        <div><Image src={sceneAfter} alt="Output after inference on all scene patches" loading="eager" /><p>Full-scene output</p></div>
+      </figure>
+    </section>
+  </article>
+
+  <article class="portfolio-project">
     <header class="project-header">
-      <div class="row"><h2><span class="entry-title">Click-bait Seeker</span><span class="entry-desc">Clickbait classifier for Chrome</span></h2><p class="date">Sep 2024 – Dec 2024</p></div>
-      <div class="row meta"><p class="context">Dongguk University Open Source Software Project · Team of 4</p><div class="links" aria-label="Click-bait Seeker resources"><a href="https://github.com/CSID-DGU/2024-02-CSC4004-2-2-NewEngineeringCenterGhost">Project code</a><a href="https://chromewebstore.google.com/detail/blcclfjholbpgmmbnghodhlkagepjbbh">Chrome Web Store</a></div></div>
+      <div class="row"><h2><span class="entry-title">Click-bait Seeker</span><span class="entry-desc">Clickbait classification for Chrome</span></h2><p class="date">Sep 2024 – Dec 2024</p></div>
+      <div class="row meta"><p>Dongguk University Open Source Software Project · Team of 4</p><div class="links"><a href="https://github.com/CSID-DGU/2024-02-CSC4004-2-2-NewEngineeringCenterGhost">Project code</a><a href="https://chromewebstore.google.com/detail/blcclfjholbpgmmbnghodhlkagepjbbh">Chrome Web Store</a></div></div>
     </header>
-    <p class="lead">Trained a classifier on about 730K AI Hub articles and highlighted sentences receiving high model attention</p>
-    <p>Responsible for preprocessing, model training, key-sentence extraction, the Python inference server, and result/GPT-commentary display</p>
-    <figure class="shots"><div><Image src={seeker} alt="Article analysis showing probability, GPT commentary, and highlighted sentences" loading="eager" format="png" /><p>Article analysis: probability, GPT commentary, and highlights</p></div><div><Image src={hover} alt="Clickbait probability shown on link hover" loading="eager" format="png" /><p>Probability on link hover</p></div></figure>
-    <figure class="diagram"><ClickbaitFlowDiagram locale="en" /></figure>
-    <p>Integrated the Python inference server with a teammate’s Spring Boot server</p>
-    <div class="two-columns">
-      <section><h3>Jamo-level FastText</h3><p>Trained embeddings on a separate Korean corpus for typo robustness and used them as Transformer inputs</p>
-        <table class="typo"><thead><tr><th>Typo</th><th>No Jamo split</th><th>Jamo split</th></tr></thead><tbody><tr><th>스맡폰</th><td>이 · 증기</td><td><strong>스마트 · 스마트폰</strong></td></tr><tr><th>ㅏㅣ폰</th><td>매료 · 베이지</td><td><strong>아이폰</strong> · 폰</td></tr><tr><th>햄벅</th><td>해질 · 낙관</td><td><strong>햄버거</strong> · 핫도그</td></tr></tbody></table>
-      </section>
-      <section><h3>Sentence selection and highlighting</h3>
-        <ul class="plain-list">
-          <li>Modified the PyTorch Transformer classifier to return per-layer attention</li>
-          <li>Selected sentences containing high-attention tokens</li>
-          <li>Compared sentences from the final layer and attention rollout; selected rollout</li>
-          <li>Matched joined morphemes against whitespace-stripped article text to locate highlights</li>
-          <li>No quantitative evaluation without sentence-level labels; attention does not establish the cause of a classification</li>
-        </ul>
-      </section>
-    </div>
-  </section>
+    <ul class="work-list project-scope">
+      <li>Link-hover probability; page and selected text/image analysis with probability and GPT commentary</li>
+      <li>Owned preprocessing, classifier training, sentence extraction and Python inference; later completed the extension's result display</li>
+    </ul>
+      <figure class="product-screen"><Image src={seeker} alt="Chrome extension displaying a clickbait probability and GPT commentary at the top of an article" loading="eager" format="png" /><figcaption>Probability/GPT banner and highlighted article text</figcaption></figure>
+
+    <section class="input-account">
+      <h3>Preparing inputs for long articles and typos</h3>
+      <ul class="work-list">
+        <li>Joined titles, subtitles and body sentences from ~730K AI Hub articles with SEP, up to 3,584 tokens</li>
+        <li>Roughly 1:1 clickbait/non-clickbait balance; stratified train/validation/test split of 9:0.5:0.5</li>
+        <li>Generated embeddings during training instead of storing ~3.5MB per sample</li>
+        <li>Computed probabilities from an eight-layer Transformer (d=256, four heads) using [CLS]</li>
+
+        <li>Trained jamo-level FastText on a separate Korean corpus for similar word representations despite typos</li>
+      </ul>
+      <table class="typo"><caption>Nearest words and cosine similarities before and after jamo decomposition</caption><thead><tr><th>Input</th><th>Without jamo decomposition</th><th>With jamo decomposition</th></tr></thead><tbody><tr><th>스맡폰</th><td>이 0.20 · 증기 0.20</td><td><strong>스마트 0.84 · 스마트폰 0.81</strong></td></tr><tr><th>ㅏㅣ폰</th><td>매료 0.19 · 베이지 0.18</td><td><strong>아이폰 0.83</strong> · 폰 0.81</td></tr><tr><th>햄벅</th><td>해질 0.21 · 낙관 0.20</td><td><strong>햄버거 0.86</strong> · 핫도그 0.68</td></tr></tbody></table>
+    </section>
+
+    <section class="page-start">
+      <h3>Extracting key sentences without sentence labels</h3>
+      <ul class="work-list">
+        <li>Modified PyTorch TransformerEncoder to return per-layer attention for sentence selection without sentence-level ground truth</li>
+        <li>Read and compared final-layer and attention-rollout selections; adopted rollout</li>
+      </ul>
+      <ol class="attention-steps" aria-label="Key sentence selection process"><li>Extract per-layer attention</li><li>Add residuals and normalize rows</li><li>Multiply layer matrices</li><li>Select high-scoring tokens</li><li>Return their sentences</li></ol>
+      <ul class="work-list">
+        <li>Returned sentences containing high-scoring tokens (z &gt; 1.96); limited selection to five tokens to avoid excessive highlighting</li>
+        <li>No quantitative sentence-level evaluation</li>
+      </ul>
+    </section>
+
+    <section>
+      <h3>Connecting the inference server and extension</h3>
+      <ul class="work-list">
+        <li>Took over integration in late November while the extension still showed placeholder probabilities</li>
+        <li>Used a coding agent to read the frontend; implemented per-link caching, queued requests and duplicate-URL suppression</li>
+
+        <li>Kept the model loaded in a persistent Python process; passed requests through a Unix-socket helper</li>
+        <li>Built whitespace removal, longest-common-substring matching and original-position mapping for text-node highlighting</li>
+        <li>Connected probability/GPT displays to a teammate's Spring Boot server; the team published to the Chrome Web Store</li>
+      </ul>
+      <figure class="diagram"><ClickbaitFlowDiagram locale="en" /></figure>
+    </section>
+  </article>
+  </div>
 </DocumentLayout>
