@@ -65,7 +65,7 @@ const languages = {
     background: var(--color-rule);
   }
 
-  /* Fixed box so the 400 → 700 weight change never shifts the layout */
+  /* Equal hit areas for both language links */
   .language-link {
     position: relative;
     display: inline-flex;
@@ -83,7 +83,6 @@ const languages = {
   }
 
   .language-link[aria-current='page'] {
-    font-weight: 700;
     color: var(--color-ink);
   }
 

@@ -6,9 +6,7 @@ interface Messages {
   documents: string;
   email: string;
   resumeTitle: string;
-  resumeDescription: string;
   portfolioTitle: string;
-  portfolioDescription: string;
   languageLabel: string;
   description: (name: string) => string;
 }
@@ -18,21 +16,17 @@ export const messages = {
     documents: '문서',
     email: '이메일',
     resumeTitle: '이력서',
-    resumeDescription: '학력, 프로젝트 경험, 기술',
     portfolioTitle: '포트폴리오',
-    portfolioDescription: '설계 과정과 구현 결과',
     languageLabel: '언어 선택',
     description: (name: string) => `${name}의 이력서와 포트폴리오.`,
   },
   en: {
     documents: 'Documents',
     email: 'Email',
-    resumeTitle: 'Resume',
-    resumeDescription: 'Education, projects, and skills',
+    resumeTitle: 'Résumé',
     portfolioTitle: 'Portfolio',
-    portfolioDescription: 'Design process and implementation results',
     languageLabel: 'Language selection',
-    description: (name: string) => `Resume and portfolio of ${name}.`,
+    description: (name: string) => `Résumé and portfolio of ${name}.`,
   },
 } satisfies Record<Locale, Messages>;
 
