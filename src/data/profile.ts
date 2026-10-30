@@ -13,7 +13,7 @@ export const profile = {
     ko: '신동주',
     en: 'SHIN DONGJU',
   },
-  role: 'Machine Learning Engineer',
+  role: 'AI/ML Engineer',
   email: 'smturtle2@kakao.com',
   github: 'https://github.com/smturtle2',
   huggingface: 'https://huggingface.co/Hermanni',

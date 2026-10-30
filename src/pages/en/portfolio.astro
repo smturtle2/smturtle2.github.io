@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import DocumentLayout from '../../layouts/DocumentLayout.astro';
+import { profile } from '../../data/profile';
 import DataFlowDiagram from '../../components/documents/DataFlowDiagram.astro';
 import ClickbaitFlowDiagram from '../../components/documents/ClickbaitFlowDiagram.astro';
 import patch1 from '../../assets/portfolio/patch_1.jpg';
@@ -17,7 +18,7 @@ const blending = `prediction = cloudy * (1.0 - mask) + candidate * mask`;
 <DocumentLayout locale="en" page="portfolio" title="SHIN DONGJU Portfolio" description="SHIN DONGJU's work on satellite image restoration models, shared training tools, and an article classification service.">
   <div class="sheet portfolio-sheet">
     <header class="portfolio-header">
-      <div><h1>SHIN DONGJU</h1><p>Machine Learning Engineer</p></div>
+      <div><h1>SHIN DONGJU</h1><p>{profile.role}</p></div>
       <address><a href="mailto:smturtle2@kakao.com">smturtle2@kakao.com</a><a href="https://github.com/smturtle2">github.com/smturtle2</a><a href="https://huggingface.co/Hermanni">huggingface.co/Hermanni</a></address>
     </header>
   <article class="portfolio-project">

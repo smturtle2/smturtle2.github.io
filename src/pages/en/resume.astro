@@ -1,12 +1,13 @@
 ---
 import DocumentLayout from '../../layouts/DocumentLayout.astro';
+import { profile } from '../../data/profile';
 ---
 
 <DocumentLayout locale="en" page="resume" title="SHIN DONGJU Résumé" description="SHIN DONGJU's education, machine learning projects, and technical skills.">
   <article class="sheet resume-sheet">
     <header class="resume-header">
       <h1>SHIN DONGJU</h1>
-      <p class="position">Machine Learning Engineer</p>
+      <p class="position">{profile.role}</p>
       <p class="contacts">
         <a href="mailto:smturtle2@kakao.com">smturtle2@kakao.com</a>
         <a href="https://github.com/smturtle2">github.com/smturtle2</a>
