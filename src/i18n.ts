@@ -8,6 +8,7 @@ interface Messages {
   resumeTitle: string;
   portfolioTitle: string;
   languageLabel: string;
+  rolePrompt: (defaultRole: string) => string;
   description: (name: string) => string;
 }
 
@@ -18,6 +19,7 @@ export const messages = {
     resumeTitle: '이력서',
     portfolioTitle: '포트폴리오',
     languageLabel: '언어 선택',
+    rolePrompt: (defaultRole: string) => `직무명 (비우면 ${defaultRole})`,
     description: (name: string) => `${name}의 이력서와 포트폴리오.`,
   },
   en: {
@@ -26,6 +28,7 @@ export const messages = {
     resumeTitle: 'Résumé',
     portfolioTitle: 'Portfolio',
     languageLabel: 'Language selection',
+    rolePrompt: (defaultRole: string) => `Job title (leave blank for ${defaultRole})`,
     description: (name: string) => `Résumé and portfolio of ${name}.`,
   },
 } satisfies Record<Locale, Messages>;

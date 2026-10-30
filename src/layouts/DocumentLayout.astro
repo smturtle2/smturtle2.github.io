@@ -6,5 +6,11 @@ interface Props { locale: Locale; page: 'resume' | 'portfolio'; title: string; d
 const { locale, page, title, description } = Astro.props;
 ---
 <SiteLayout locale={locale} page={page} title={title} description={description}>
-  <main class:list={['document', `document--${page}`]}><slot /></main>
+  <main class:list={['document', `document--${page}`]} data-document-page={page} data-document-locale={locale}><slot /></main>
 </SiteLayout>
+
+<script>
+  import { initRoleEditor } from '../scripts/role-editor';
+
+  initRoleEditor();
+</script>
