@@ -473,7 +473,7 @@
   font-size: 13pt;
 }
 
-.document .case-phase > h4 {
+.document :is(.case-phase, .outcome-copy) > h4 {
   margin: 4mm 0 2mm;
   font-size: 11pt;
   line-height: 1.35;
@@ -483,7 +483,7 @@
   width: 100%;
 }
 
-.case-phase > .work-list {
+:is(.case-phase, .outcome-copy) > .work-list {
   margin-block: 2mm;
 }
 
@@ -570,6 +570,30 @@
   transform: translateY(-50%);
 }
 
+.document .outcome-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 38mm;
+  column-gap: 8mm;
+  align-items: start;
+  margin-top: 4mm;
+}
+
+.document .outcome-copy > h4 {
+  margin-top: 0;
+}
+
+.outcome-preview > .hover-preview {
+  margin: 0;
+}
+
+.document .nowrap {
+  white-space: nowrap;
+}
+
+.hover-preview img {
+  border: 0.6pt solid var(--color-rule);
+}
+
 /* Diagram presentation; components own only geometry and labels. */
 .document .diagram {
   margin: 4mm 0;
@@ -630,6 +654,15 @@
 
 /* Narrow screens */
 @media screen and (max-width: 700px) {
+  .document .outcome-preview {
+    display: block;
+  }
+
+  .outcome-preview > .hover-preview {
+    width: min(100%, 42mm);
+    margin: 3mm 0 0;
+  }
+
   .document .decomposition-figure {
     max-width: 100%;
   }
@@ -783,7 +816,7 @@
   }
 
   .model-blending,
-  .case-phase > .work-list > li {
+  :is(.case-phase, .outcome-copy) > .work-list > li {
     break-inside: avoid;
   }
 

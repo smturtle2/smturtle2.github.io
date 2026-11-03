@@ -14,6 +14,7 @@ import sceneBefore from '../../assets/portfolio/scene_before.jpg';
 import sceneMid from '../../assets/portfolio/scene_mid.jpg';
 import sceneAfter from '../../assets/portfolio/scene_after.jpg';
 import seeker from '../../assets/portfolio/seeker.png';
+import hover from '../../assets/portfolio/hover.png';
 const blending = `prediction = cloudy * (1.0 - mask) + candidate * mask`;
 ---
 <DocumentLayout locale="ko" page="portfolio" title="신동주 포트폴리오" description="신동주의 위성영상 복원 모델, 공용 학습 환경, 기사 분류 서비스 개발 경험.">
@@ -294,8 +295,13 @@ const blending = `prediction = cloudy * (1.0 - mask) + candidate * mask`;
           </ul>
         </section>
         <section class="case-phase">
-          <h4>04 실제 분석 결과 표시와 Chrome 웹 스토어 배포</h4>
-          <ul class="work-list"><li>임의 확률을 표시하던 화면을 실제 서버 응답에 연결해 낚시성 확률·주요 문장 강조·GPT 해설 표시를 완성하고, 팀에서 Chrome 웹 스토어에 배포</li></ul>
+          <div class="outcome-preview">
+            <div class="outcome-copy">
+              <h4>04 실제 분석 결과 표시와 Chrome 웹 스토어 배포</h4>
+              <ul class="work-list"><li>임의 확률을 표시하던 화면을 실제 서버 응답에 연결해 낚시성 확률·주요 문장 <span class="nowrap">강조·GPT</span> 해설 표시를 완성하고, 팀에서 Chrome 웹 스토어에 배포</li></ul>
+            </div>
+            <figure class="hover-preview"><Image src={hover} alt="기사 링크에 마우스를 올리면 낚시성 확률이 표시되는 화면" loading="eager" format="png" /></figure>
+          </div>
           <figure class="product-screen"><Image src={seeker} alt="기사 상단의 낚시성 확률·GPT 해설 배너와 본문 주요 문장 강조 표시" loading="eager" format="png" /></figure>
         </section>
         </div>
