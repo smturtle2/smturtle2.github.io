@@ -466,6 +466,27 @@
   grid-column: 1 / -1;
 }
 
+.portfolio-case > h3,
+.portfolio-case > .case-opening > h3 {
+  padding-bottom: 2mm;
+  border-bottom: 0.8pt solid var(--color-ink);
+  font-size: 13pt;
+}
+
+.document .case-phase > h4 {
+  margin: 4mm 0 2mm;
+  font-size: 11pt;
+  line-height: 1.35;
+}
+
+.portfolio-case .metrics {
+  width: 100%;
+}
+
+.case-phase > .work-list {
+  margin-block: 2mm;
+}
+
 .runtime-result {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -483,6 +504,10 @@
 
 .runtime-result .compact-metrics th:first-child {
   white-space: normal;
+}
+
+.attention-comparison {
+  grid-template-columns: 1.3fr 1fr;
 }
 
 .model-name {
@@ -753,8 +778,20 @@
     break-inside: avoid;
   }
 
-  .document :where(h2, h3) {
+  .document :where(h2, h3, h4) {
     break-after: avoid;
+  }
+
+  .model-blending,
+  .case-phase > .work-list > li {
+    break-inside: avoid;
+  }
+
+  .portfolio-case:not(.portfolio-case-long),
+  .portfolio-case-long > .case-phase,
+  .case-opening,
+  .case-resolution {
+    break-inside: avoid;
   }
 
   .document :where(figure, table, .items li) {
