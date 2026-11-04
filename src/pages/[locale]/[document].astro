@@ -1,0 +1,20 @@
+---
+import DocumentLayout from '../../layouts/DocumentLayout.astro';
+import DocumentRenderer from '../../components/documents/DocumentRenderer.astro';
+import { buildDocuments } from '../../documents/factories';
+import type { DocumentId } from '../../documents/registry';
+import type { DocumentModel } from '../../documents/core/model';
+
+export function getStaticPaths() {
+  return buildDocuments().map(({ id, locale, model }) => ({
+    params: { locale, document: id },
+    props: { id, model },
+  }));
+}
+
+interface Props { id: DocumentId; model: DocumentModel; }
+const { id, model } = Astro.props;
+---
+<DocumentLayout locale={model.locale} page={id} title={model.title} description={model.description}>
+  <DocumentRenderer document={model} />
+</DocumentLayout>

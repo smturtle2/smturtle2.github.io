@@ -1,0 +1,12 @@
+---
+import type { RichText } from '../../documents/core/model';
+interface Props { content: RichText; }
+const { content } = Astro.props;
+const parts = typeof content === 'string' ? [content] : content;
+---
+{parts.map((part) => typeof part === 'string' ? part : (
+  part.kind === 'link' ? <a href={part.href}><Astro.self content={part.children} /></a> :
+  part.kind === 'code' ? <code>{part.text}</code> :
+  part.kind === 'strong' ? <strong><Astro.self content={part.children} /></strong> :
+  <span class="nowrap"><Astro.self content={part.children} /></span>
+))}

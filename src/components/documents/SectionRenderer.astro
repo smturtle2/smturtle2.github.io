@@ -1,0 +1,55 @@
+---
+import SectionHeader from './SectionHeader.astro';
+import DocumentChildren from './DocumentChildren.astro';
+import BlockRenderer from './BlockRenderer.astro';
+import { printGroups } from './section-layout';
+import type { Locale } from '../../i18n';
+import type { Section } from '../../documents/core/model';
+interface Props { section: Section; locale: Locale; level: number; path: readonly string[]; number?: number; }
+const { section, locale, level, path, number } = Astro.props;
+const id = path.map(encodeURIComponent).join('/');
+const titleId = `${id}/title`;
+const nextLevel = level + (section.header ? 1 : 0);
+const sections = section.children.filter((child): child is Section => child.kind === 'section');
+const numbers = section.numberSections ? new Map(sections.map((child, index) => [child, index + 1])) : undefined;
+const layout = section.layout;
+const cuts = layout?.kind === 'linear' ? layout.allowBreakAfter : undefined;
+const groups = cuts && cuts.length > 0 ? printGroups(section.children, cuts) : undefined;
+const keepTogether = layout?.kind === 'columns' || cuts?.length === 0;
+const columnIndex = layout?.kind === 'columns' ? section.children.findIndex((child) => child.kind === 'section' && child.id === layout.asideSection) : -1;
+const asideAsset = layout?.kind === 'image-aside' ? layout.asset : undefined;
+const asideIndex = asideAsset ? section.children.findIndex((child) => child.kind === 'figure' && child.asset.id === asideAsset) : -1;
+const asideFigure = asideIndex >= 0 ? section.children[asideIndex] : undefined;
+---
+<section class:list={['section', { 'keep-together': keepTogether }]} data-role={section.role} id={id} aria-labelledby={section.header ? titleId : undefined}>
+  {layout?.kind === 'columns' ? (
+    <>
+      {section.header && <SectionHeader header={section.header} level={level} role={section.role} titleId={titleId} number={number} />}
+      <div class="layout-columns">
+        <div><DocumentChildren children={section.children.slice(0, columnIndex)} locale={locale} level={nextLevel} path={path} numbers={numbers} /></div>
+        <DocumentChildren children={section.children.slice(columnIndex)} locale={locale} level={nextLevel} path={path} numbers={numbers} />
+      </div>
+    </>
+  ) : asideFigure?.kind === 'figure' ? (
+    <>
+      <div class="layout-image-aside">
+        <div class="aside-copy">
+          {section.header && <SectionHeader header={section.header} level={level} role={section.role} titleId={titleId} number={number} placement="aside" />}
+          <DocumentChildren children={section.children.slice(0, asideIndex)} locale={locale} level={nextLevel} path={path} numbers={numbers} />
+        </div>
+        <BlockRenderer block={asideFigure} locale={locale} />
+      </div>
+      <DocumentChildren children={section.children.slice(asideIndex + 1)} locale={locale} level={nextLevel} path={path} numbers={numbers} />
+    </>
+  ) : groups ? groups.map((children, index) => (
+    <div class="layout-group">
+      {index === 0 && section.header && <SectionHeader header={section.header} level={level} role={section.role} titleId={titleId} number={number} />}
+      <DocumentChildren children={children} locale={locale} level={nextLevel} path={path} numbers={numbers} />
+    </div>
+  )) : (
+    <>
+      {section.header && <SectionHeader header={section.header} level={level} role={section.role} titleId={titleId} number={number} />}
+      <DocumentChildren children={section.children} locale={locale} level={nextLevel} path={path} numbers={numbers} />
+    </>
+  )}
+</section>

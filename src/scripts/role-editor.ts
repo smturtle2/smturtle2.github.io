@@ -1,13 +1,14 @@
 import { profile } from '../data/profile';
 import { isLocale, messages } from '../i18n';
 import { buildDocumentTitle } from './document-title';
+import { isDocumentId } from '../documents/registry';
 
 export function initRoleEditor(): void {
   const root = document.querySelector<HTMLElement>('[data-document-page]');
   const locale = root?.dataset.documentLocale;
   const page = root?.dataset.documentPage;
 
-  if (!root || !isLocale(locale) || (page !== 'resume' && page !== 'portfolio')) return;
+  if (!root || !isLocale(locale) || !isDocumentId(page)) return;
 
   const roleElements = root.querySelectorAll<HTMLElement>('[data-profile-role]');
   if (roleElements.length === 0) return;

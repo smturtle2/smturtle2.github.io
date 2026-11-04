@@ -1,12 +1,6 @@
 import { profile } from '../data/profile';
-import type { Locale, PageKey } from '../i18n';
-
-export type DocumentPage = Exclude<PageKey, 'home'>;
-
-const documentNames = {
-  ko: { resume: '이력서', portfolio: '포트폴리오' },
-  en: { resume: 'Resume', portfolio: 'Portfolio' },
-} as const satisfies Record<Locale, Record<DocumentPage, string>>;
+import type { Locale } from '../i18n';
+import { documentRegistry, type DocumentId } from '../documents/registry';
 
 function filenamePart(value: string): string {
   return value
@@ -17,8 +11,8 @@ function filenamePart(value: string): string {
     .replace(/^[._]+|[._]+$/g, '');
 }
 
-export function buildDocumentTitle(locale: Locale, page: DocumentPage, role: string): string {
+export function buildDocumentTitle(locale: Locale, page: DocumentId, role: string): string {
   const rolePart = filenamePart(role) || filenamePart(profile.role);
 
-  return [filenamePart(profile.names[locale]), rolePart, documentNames[locale][page]].join('_');
+  return [filenamePart(profile.names[locale]), rolePart, filenamePart(documentRegistry[page][locale].filename)].join('_');
 }

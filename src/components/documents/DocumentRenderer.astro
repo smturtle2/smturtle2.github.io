@@ -1,0 +1,11 @@
+---
+import DocumentHeader from './DocumentHeader.astro';
+import DocumentChildren from './DocumentChildren.astro';
+import type { DocumentModel } from '../../documents/core/model';
+interface Props { document: DocumentModel; }
+const { document } = Astro.props;
+---
+<div class="sheet">
+  <DocumentHeader header={document.header} />
+  <DocumentChildren children={document.children} locale={document.locale} level={2} path={[document.id]} />
+</div>

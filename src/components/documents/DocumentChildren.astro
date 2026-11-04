@@ -1,0 +1,9 @@
+---
+import BlockRenderer from './BlockRenderer.astro';
+import SectionRenderer from './SectionRenderer.astro';
+import type { Locale } from '../../i18n';
+import type { DocumentChild, Section } from '../../documents/core/model';
+interface Props { children: readonly DocumentChild[]; locale: Locale; level: number; path: readonly string[]; numbers?: ReadonlyMap<Section, number>; }
+const { children, locale, level, path, numbers } = Astro.props;
+---
+{children.map((child) => child.kind === 'section' ? <SectionRenderer section={child} locale={locale} level={level} path={[...path, child.id]} number={numbers?.get(child)} /> : <BlockRenderer block={child} locale={locale} />)}

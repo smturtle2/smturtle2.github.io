@@ -1,12 +1,12 @@
+import type { DocumentId } from './documents/registry';
+
 export const locales = ['ko', 'en'] as const;
 export type Locale = (typeof locales)[number];
-export type PageKey = 'home' | 'resume' | 'portfolio';
+export type PageKey = 'home' | DocumentId;
 
 interface Messages {
   documents: string;
   email: string;
-  resumeTitle: string;
-  portfolioTitle: string;
   languageLabel: string;
   rolePrompt: (defaultRole: string) => string;
   description: (name: string) => string;
@@ -16,8 +16,6 @@ export const messages = {
   ko: {
     documents: '문서',
     email: '이메일',
-    resumeTitle: '이력서',
-    portfolioTitle: '포트폴리오',
     languageLabel: '언어 선택',
     rolePrompt: (defaultRole: string) => `직무명 (비우면 ${defaultRole})`,
     description: (name: string) => `${name}의 이력서와 포트폴리오.`,
@@ -25,8 +23,6 @@ export const messages = {
   en: {
     documents: 'Documents',
     email: 'Email',
-    resumeTitle: 'Résumé',
-    portfolioTitle: 'Portfolio',
     languageLabel: 'Language selection',
     rolePrompt: (defaultRole: string) => `Job title (leave blank for ${defaultRole})`,
     description: (name: string) => `Résumé and portfolio of ${name}.`,
@@ -34,11 +30,12 @@ export const messages = {
 } satisfies Record<Locale, Messages>;
 
 export function isLocale(value: unknown): value is Locale {
-  return value === 'ko' || value === 'en';
+  return typeof value === 'string' && locales.some((locale) => locale === value);
 }
 
 export function localeFromBrowser(language: string): Locale {
-  return language.split('-')[0].toLowerCase() === 'ko' ? 'ko' : 'en';
+  const locale = language.split('-')[0].toLowerCase();
+  return isLocale(locale) ? locale : 'en';
 }
 
 export function localePath(locale: Locale, page: PageKey = 'home'): string {

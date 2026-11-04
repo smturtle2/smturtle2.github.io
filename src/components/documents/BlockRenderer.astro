@@ -1,0 +1,43 @@
+---
+import { Image } from 'astro:assets';
+import RichText from './RichText.astro';
+import type { Locale } from '../../i18n';
+import type { Block, Cell, FigureBlock, ImageAsset, RichText as RichValue } from '../../documents/core/model';
+interface Props { block: Block; locale: Locale; }
+const { block, locale } = Astro.props;
+const Diagram = block.kind === 'figure' && block.asset.kind === 'diagram' ? block.asset.component : undefined;
+const isImageFigure = (figure: FigureBlock): figure is FigureBlock & { asset: ImageAsset; alt: string } => figure.asset.kind === 'image';
+const cellContent = (cell: RichValue | Cell): RichValue => typeof cell === 'object' && 'content' in cell ? cell.content : cell;
+const cellAccent = (cell: RichValue | Cell): boolean => typeof cell === 'object' && 'accent' in cell && cell.accent === true;
+---
+{block.kind === 'paragraph' && <p class:list={['block-paragraph', { lead: block.lead }]}><RichText content={block.content} /></p>}
+{block.kind === 'list' && (
+  <ul class="block-list">
+    {block.items.map((item) => <li>{typeof item === 'object' && 'lines' in item ? item.lines.map((line) => <span class="list-line"><RichText content={line} /></span>) : <RichText content={item} />}</li>)}
+  </ul>
+)}
+{block.kind === 'figure' && (
+  <figure class:list={['block-figure', `block-figure--${block.variant ?? 'wide'}`]} data-asset={block.asset.id}>
+    {isImageFigure(block) ? <Image src={block.asset.source} alt={block.alt} loading="eager" format={block.asset.format} /> : Diagram && <Diagram locale={locale} />}
+    {block.caption !== undefined && <figcaption><RichText content={block.caption} /></figcaption>}
+  </figure>
+)}
+{block.kind === 'gallery' && (
+  <figure class:list={['block-gallery', `block-gallery--${block.variant}`]}>
+    {block.items.map((item) => <div class:list={{ selected: item.selected }} data-asset={item.asset.id}><Image src={item.asset.source} alt={item.alt} loading="eager" format={item.asset.format} /><p>{item.label}</p></div>)}
+    {block.caption !== undefined && <figcaption><RichText content={block.caption} /></figcaption>}
+  </figure>
+)}
+{block.kind === 'table' && (
+  <table class:list={['block-table', `block-table--${block.variant}`]} data-asset={block.asset?.id}>
+    {block.caption !== undefined && <caption><RichText content={block.caption} /></caption>}
+    <thead><tr>{block.columns.map((column) => <th scope="col"><RichText content={column} /></th>)}</tr></thead>
+    <tbody>{(block.asset?.rows ?? block.rows ?? []).map((row) => <tr class:list={{ chosen: row.selected }}>{row.cells.map((cell, index) => index === 0 ? <th scope="row" class:list={{ accent: cellAccent(cell) }}><RichText content={cellContent(cell)} /></th> : <td class:list={{ accent: cellAccent(cell) }}><RichText content={cellContent(cell)} /></td>)}</tr>)}</tbody>
+  </table>
+)}
+{block.kind === 'equation' && (
+  <div class="block-equation">
+    <p class="equation-expression">{block.href ? <a href={block.href}><code>{block.expression}</code></a> : <code>{block.expression}</code>}</p>
+    {block.explanation !== undefined && <p><RichText content={block.explanation} /></p>}
+  </div>
+)}

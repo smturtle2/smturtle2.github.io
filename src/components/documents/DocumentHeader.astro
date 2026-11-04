@@ -1,0 +1,13 @@
+---
+import RichText from './RichText.astro';
+import type { DocumentHeader } from '../../documents/core/model';
+interface Props { header: DocumentHeader; }
+const { header } = Astro.props;
+---
+<header class="document-header">
+  <div class="identity">
+    <h1><RichText content={header.title} /></h1>
+    {header.profileRole !== undefined && <p class="position" data-profile-role>{header.profileRole}</p>}
+  </div>
+  {header.contacts !== undefined && <address class="contacts">{header.contacts.map((contact) => <a href={contact.href}>{contact.label}</a>)}</address>}
+</header>

@@ -1,0 +1,25 @@
+---
+import RichText from './RichText.astro';
+import type { Header } from '../../documents/core/model';
+interface Props { header: Header; level: number; role: string; titleId: string; number?: number; placement?: 'aside'; }
+const { header, level, role, titleId, number, placement } = Astro.props;
+if (level < 1 || level > 6) throw new Error(`Unsupported heading level: ${level}`);
+const Heading = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+const prefix = number === undefined ? '' : `${String(number).padStart(2, '0')} `;
+const detailed = header.subtitle !== undefined || header.period !== undefined || header.note !== undefined || header.side !== undefined || header.links !== undefined;
+---
+{detailed ? (
+  <header class="section-header" data-role={role}>
+    <div class="row">
+      <Heading class="section-title" data-role={role} data-placement={placement} id={titleId}><span class="entry-title">{prefix}<RichText content={header.title} /></span>{header.subtitle !== undefined && <span class="entry-desc"><RichText content={header.subtitle} /></span>}</Heading>
+      {header.period !== undefined && <p class="date">{header.period}</p>}
+    </div>
+    {(header.note !== undefined || header.side !== undefined || header.links !== undefined) && (
+      <div class="row meta">
+        {header.note !== undefined && <p class="context"><RichText content={header.note} /></p>}
+        {header.side !== undefined && <p><RichText content={header.side} /></p>}
+        {header.links !== undefined && <div class="links" aria-label={header.linksLabel}>{header.links.map((link) => <a href={link.href}>{link.label}</a>)}</div>}
+      </div>
+    )}
+  </header>
+) : <Heading class="section-title" data-role={role} data-placement={placement} id={titleId}>{prefix}<RichText content={header.title} /></Heading>}
