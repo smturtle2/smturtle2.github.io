@@ -681,6 +681,55 @@
   font-weight: 700;
 }
 
+/* Project openings on screen */
+@media screen {
+  .document--portfolio .section[data-role="project"] + .section[data-role="project"] {
+    position: relative;
+    margin-top: 88px;
+    padding-top: 32px;
+    border-top: 0;
+  }
+
+  .document--portfolio .section[data-role="project"] + .section[data-role="project"]::before {
+    position: absolute;
+    top: 0;
+    left: -20mm;
+    right: -20mm;
+    border-top: 3px solid var(--color-ink);
+    content: '';
+  }
+
+  .document--portfolio .section-title[data-role="project"] {
+    font-size: 40px;
+    line-height: 1.2;
+  }
+
+  .document--portfolio .section-header[data-role="project"] {
+    margin-bottom: 24px;
+  }
+
+  .document--portfolio .section-header[data-role="project"] .entry-desc {
+    display: block;
+    margin: 8px 0 0;
+    color: var(--color-sub);
+    font-size: 16px;
+  }
+
+  .document--portfolio .section-header[data-role="project"] .row.meta {
+    display: block;
+    margin-top: 12px;
+    color: var(--color-sub);
+    font-size: 13px;
+  }
+
+  .document--portfolio .section-header[data-role="project"] .links {
+    justify-content: flex-start;
+    gap: 8px 16px;
+    margin-top: 8px;
+    font-size: 13px;
+  }
+}
+
 /* Narrow screens */
 @media screen and (max-width: 700px) {
   .document .layout-image-aside {
@@ -728,6 +777,20 @@
 
   .sheet {
     padding: 28px 20px;
+  }
+
+  .document--portfolio .section[data-role="project"] + .section[data-role="project"] {
+    margin-top: 64px;
+    padding-top: 24px;
+  }
+
+  .document--portfolio .section[data-role="project"] + .section[data-role="project"]::before {
+    left: -20px;
+    right: -20px;
+  }
+
+  .document--portfolio .section-title[data-role="project"] {
+    font-size: 32px;
   }
 
   .document,
