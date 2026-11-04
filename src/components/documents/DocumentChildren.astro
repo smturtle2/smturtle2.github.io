@@ -1,9 +1,33 @@
 ---
-import BlockRenderer from './BlockRenderer.astro';
+import PairedBlock from './PairedBlock.astro';
 import SectionRenderer from './SectionRenderer.astro';
 import type { Locale } from '../../i18n';
-import type { DocumentChild, Section } from '../../documents/core/model';
-interface Props { children: readonly DocumentChild[]; locale: Locale; level: number; path: readonly string[]; numbers?: ReadonlyMap<Section, number>; }
-const { children, locale, level, path, numbers } = Astro.props;
+import type { Header } from '../../documents/core/model';
+import type { LocaleVariant, PairedChild, PairedSection } from '../../documents/core/pairing';
+interface Props {
+  children: readonly PairedChild[];
+  locale: Locale;
+  level: number;
+  path: readonly string[];
+  numbers?: ReadonlyMap<PairedSection, number>;
+  headers?: readonly LocaleVariant<Header>[];
+  headerLevel?: number;
+  headerRole?: string;
+  headerNumber?: number;
+  headerPlacement?: 'aside';
+  reserveId?: string;
+  reserveHeader?: boolean;
+}
+const { children, locale, level, path, numbers, headers, headerLevel = level, headerRole = '', headerNumber, headerPlacement, reserveId, reserveHeader = false } = Astro.props;
+const id = path.map(encodeURIComponent).join('/');
+const first = children[0];
+const combined = headers && first?.kind === 'content' && !first.anchor ? first : undefined;
+const remaining = combined ? children.slice(1) : children;
 ---
-{children.map((child) => child.kind === 'section' ? <SectionRenderer section={child} locale={locale} level={level} path={[...path, child.id]} number={numbers?.get(child)} /> : <BlockRenderer block={child} locale={locale} />)}
+{headers && <PairedBlock id={combined ? id + '/' + combined.id : id + '/header'} locale={locale} content={combined} headers={headers} level={headerLevel} role={headerRole} titleId={id + '/title'} number={headerNumber} placement={headerPlacement} sectionEnd={combined ? combined.id === reserveId : reserveHeader} />}
+{remaining.map((child, index) => {
+  const previous = children[index + (combined ? 1 : 0) - 1];
+  return child.kind === 'section'
+    ? <SectionRenderer section={child} locale={locale} level={level} path={[...path, child.id]} number={numbers?.get(child)} />
+    : <PairedBlock id={id + '/' + child.id} content={child} previousContent={previous?.kind === 'content' ? previous : undefined} locale={locale} sectionEnd={child.id === reserveId} />;
+})}

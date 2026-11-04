@@ -4,17 +4,18 @@ import DocumentRenderer from '../../components/documents/DocumentRenderer.astro'
 import { buildDocuments } from '../../documents/factories';
 import type { DocumentId } from '../../documents/registry';
 import type { DocumentModel } from '../../documents/core/model';
+import type { PairedDocument } from '../../documents/core/pairing';
 
 export function getStaticPaths() {
-  return buildDocuments().map(({ id, locale, model }) => ({
+  return buildDocuments().map(({ id, locale, model, paired }) => ({
     params: { locale, document: id },
-    props: { id, model },
+    props: { id, model, paired },
   }));
 }
 
-interface Props { id: DocumentId; model: DocumentModel; }
-const { id, model } = Astro.props;
+interface Props { id: DocumentId; model: DocumentModel; paired: PairedDocument; }
+const { id, model, paired } = Astro.props;
 ---
 <DocumentLayout locale={model.locale} page={id} title={model.title} description={model.description}>
-  <DocumentRenderer document={model} />
+  <DocumentRenderer document={paired} locale={model.locale} />
 </DocumentLayout>

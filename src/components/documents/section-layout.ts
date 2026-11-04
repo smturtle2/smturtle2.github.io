@@ -1,10 +1,10 @@
-import type { DocumentChild } from '../../documents/core/model';
+import type { PairedChild } from '../../documents/core/pairing';
 
 /** Allowed boundaries split a sequence into contiguous, preferred print units. */
-export function printGroups(children: readonly DocumentChild[], allowBreakAfter: readonly string[]): readonly (readonly DocumentChild[])[] {
+export function printGroups(children: readonly PairedChild[], allowBreakAfter: readonly string[]): readonly (readonly PairedChild[])[] {
   const boundaries = new Set(allowBreakAfter);
-  const groups: DocumentChild[][] = [];
-  let current: DocumentChild[] = [];
+  const groups: PairedChild[][] = [];
+  let current: PairedChild[] = [];
   for (const child of children) {
     current.push(child);
     if (child.kind === 'section' && boundaries.has(child.id)) {

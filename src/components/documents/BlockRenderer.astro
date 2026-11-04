@@ -3,8 +3,8 @@ import { Image } from 'astro:assets';
 import RichText from './RichText.astro';
 import type { Locale } from '../../i18n';
 import type { Block, Cell, FigureBlock, ImageAsset, RichText as RichValue } from '../../documents/core/model';
-interface Props { block: Block; locale: Locale; }
-const { block, locale } = Astro.props;
+interface Props { block: Block; locale: Locale; idPrefix?: string; }
+const { block, locale, idPrefix } = Astro.props;
 const Diagram = block.kind === 'figure' && block.asset.kind === 'diagram' ? block.asset.component : undefined;
 const isImageFigure = (figure: FigureBlock): figure is FigureBlock & { asset: ImageAsset; alt: string } => figure.asset.kind === 'image';
 const cellContent = (cell: RichValue | Cell): RichValue => typeof cell === 'object' && 'content' in cell ? cell.content : cell;
@@ -18,7 +18,7 @@ const cellAccent = (cell: RichValue | Cell): boolean => typeof cell === 'object'
 )}
 {block.kind === 'figure' && (
   <figure class:list={['block-figure', `block-figure--${block.variant ?? 'wide'}`]} data-asset={block.asset.id}>
-    {isImageFigure(block) ? <Image src={block.asset.source} alt={block.alt} loading="eager" format={block.asset.format} /> : Diagram && <Diagram locale={locale} />}
+    {isImageFigure(block) ? <Image src={block.asset.source} alt={block.alt} loading="eager" format={block.asset.format} /> : Diagram && <Diagram locale={locale} idPrefix={idPrefix} />}
     {block.caption !== undefined && <figcaption><RichText content={block.caption} /></figcaption>}
   </figure>
 )}

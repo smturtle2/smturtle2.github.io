@@ -1,7 +1,7 @@
 import { locales, type Locale } from '../i18n';
 import { documentIds, type DocumentId } from './registry';
 import type { DocumentModel } from './core/model';
-import { validateTranslations } from './core/validate';
+import { pairDocuments } from './core/pairing';
 import { createPortfolio } from './portfolio/document';
 import { createResume } from './resume/document';
 
@@ -17,7 +17,7 @@ export function buildDocuments() {
     for (const model of translations) {
       if (model.id !== id) throw new Error(`Document factory ${id} returned ${model.id}`);
     }
-    validateTranslations(translations);
-    return translations.map((model) => ({ id, locale: model.locale, model }));
+    const paired = pairDocuments(translations);
+    return translations.map((model) => ({ id, locale: model.locale, model, paired }));
   });
 }

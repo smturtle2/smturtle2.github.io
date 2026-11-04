@@ -1,11 +1,12 @@
 ---
-import DocumentHeader from './DocumentHeader.astro';
+import PairedBlock from './PairedBlock.astro';
 import DocumentChildren from './DocumentChildren.astro';
-import type { DocumentModel } from '../../documents/core/model';
-interface Props { document: DocumentModel; }
-const { document } = Astro.props;
+import type { Locale } from '../../i18n';
+import type { PairedDocument } from '../../documents/core/pairing';
+interface Props { document: PairedDocument; locale: Locale; }
+const { document, locale } = Astro.props;
 ---
 <div class="sheet">
-  <DocumentHeader header={document.header} />
-  <DocumentChildren children={document.children} locale={document.locale} level={2} path={[document.id]} />
+  <PairedBlock id={document.id + '/header'} documentHeaders={document.headers} locale={locale} sectionEnd />
+  <DocumentChildren children={document.children} locale={locale} level={2} path={[document.id]} />
 </div>

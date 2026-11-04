@@ -71,6 +71,7 @@ export const ko = {
                   '학습 가능한 64개 밴드 벡터를 두고, 구름 성분에서 예측한 픽셀별 비중으로 섞어 13개 밴드의 마스크를 만듦',
                 ]),
                 equation(blending, {
+                  id: 'input-candidate-blending',
                   href: 'https://github.com/smturtle2/cr-project/blob/decdb3342954d21ea8132efd6722b04fc33050f4/modules/model/CLEAR_Net/clear_net.py#L140',
                   explanation: '픽셀·밴드마다 마스크가 0에 가까우면 원본을, 1에 가까우면 복원 후보를 더 많이 반영',
                 }),
@@ -79,6 +80,7 @@ export const ko = {
                 ]),
                 table({
                   columns: ['학습 대상', '손실', '목적'],
+                  id: 'restoration-losses',
                   variant: 'descriptive',
                   rows: [
                     { cells: ['혼합한 최종 출력', 'L1+SSIM', '최종 영상의 픽셀 오차와 구조 차이 반영'] },
@@ -170,6 +172,7 @@ export const ko = {
                 ]),
                 table({
                   columns: ['검토한 방식', '데이터 선택·읽기', '로컬 보관'],
+                  id: 'streaming-approaches',
                   variant: 'descriptive',
                   rows: [
                     { cells: ['Hugging Face 직접 스트리밍', '초기 구현에서 셔플·종료 처리 불안정', '전체 사본 불필요'] },

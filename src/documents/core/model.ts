@@ -32,15 +32,16 @@ export interface ImageAsset {
 export interface DiagramAsset {
   kind: 'diagram';
   id: string;
-  component: (props: { locale: Locale }) => unknown;
+  component: (props: { locale: Locale; idPrefix?: string }) => unknown;
 }
 export interface Cell { content: RichText; accent?: boolean; }
 export interface TableRow { cells: readonly (RichText | Cell)[]; selected?: boolean; }
 export interface TableAsset { id: string; rows: readonly TableRow[]; }
 
-export type ParagraphBlock = { kind: 'paragraph'; content: RichText; lead?: boolean };
+export type ParagraphBlock = { kind: 'paragraph'; id?: string; content: RichText; lead?: boolean };
 export type ListBlock = {
   kind: 'list';
+  id?: string;
   items: readonly (RichText | { lines: readonly RichText[] })[];
 };
 export type FigureBlock = {
@@ -60,8 +61,8 @@ export type TableBlock = {
   columns: readonly RichText[];
   caption?: RichText;
   variant: 'numeric' | 'compact' | 'comparison' | 'descriptive';
-} & ({ asset: TableAsset; rows?: never } | { rows: readonly TableRow[]; asset?: never });
-export type EquationBlock = { kind: 'equation'; expression: string; href?: string; explanation?: RichText };
+} & ({ asset: TableAsset; rows?: never; id?: never } | { id: string; rows: readonly TableRow[]; asset?: never });
+export type EquationBlock = { kind: 'equation'; id: string; expression: string; href?: string; explanation?: RichText };
 export type Block = ParagraphBlock | ListBlock | FigureBlock | GalleryBlock | TableBlock | EquationBlock;
 
 export type SectionLayout<ChildId extends string = string> =

@@ -1,11 +1,13 @@
 ---
-interface Props { locale: 'ko' | 'en'; }
-const { locale } = Astro.props;
+import { diagramId } from './diagram-id';
+interface Props { locale: 'ko' | 'en'; idPrefix?: string; }
+const { locale, idPrefix } = Astro.props;
+const arrowId = diagramId(idPrefix, 'analysis-arrow');
 const en = locale === 'en';
 ---
 <div class="diagram-viewport">
   <svg viewBox="-0.5 -0.5 171 58.5" role="img" aria-label={en ? 'Article inputs pass through jamo FastText and a Transformer. The Transformer returns probability and attention; attention rollout selects sentences. The article body and selected sentences feed GPT commentary. Probability, selected sentences, and commentary appear in the article UI.' : '기사 입력을 자모 FastText와 Transformer로 처리해 확률과 attention을 얻고, rollout으로 주요 문장을 선정한다. 본문과 주요 문장을 입력받은 GPT 해설은 확률·문장 강조와 함께 기사 화면에 표시된다.'}>
-    <defs><marker id="analysis-arrow" viewBox="0 0 8 8" refX="7.2" refY="4" markerUnits="userSpaceOnUse" markerWidth="1.9" markerHeight="1.9" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="arrow-head" /></marker></defs>
+    <defs><marker id={arrowId} viewBox="0 0 8 8" refX="7.2" refY="4" markerUnits="userSpaceOnUse" markerWidth="1.9" markerHeight="1.9" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="arrow-head" /></marker></defs>
     <rect class="box" x="0" y="6.5" width="28" height="13" rx="0.8" />
     <rect class="box accent" x="34" y="6.5" width="30" height="13" rx="0.8" />
     <rect class="box accent" x="70" y="6.5" width="32" height="13" rx="0.8" />
@@ -15,16 +17,16 @@ const en = locale === 'en';
     <rect class="box" x="110" y="44.5" width="31" height="13" rx="0.8" />
     <rect class="box accent" x="151" y="0" width="19" height="57.5" rx="0.8" />
 
-    <path class="arrow" marker-end="url(#analysis-arrow)" d="M28,13 H33.6" />
-    <path class="arrow" marker-end="url(#analysis-arrow)" d="M64,13 H69.6" />
-    <path class="arrow" marker-end="url(#analysis-arrow)" d="M102,13 H109.6" />
-    <path class="arrow" marker-end="url(#analysis-arrow)" d="M86,19.5 V25.1" />
-    <path class="arrow" marker-end="url(#analysis-arrow)" d="M102,32 H109.6" />
-    <path class="arrow" marker-end="url(#analysis-arrow)" d="M125.5,38.5 V44.1" />
-    <path class="arrow" marker-end="url(#analysis-arrow)" d="M14,19.5 V51 H109.6" />
-    <path class="arrow" marker-end="url(#analysis-arrow)" d="M141,13 H150.6" />
-    <path class="arrow" marker-end="url(#analysis-arrow)" d="M141,32 H150.6" />
-    <path class="arrow" marker-end="url(#analysis-arrow)" d="M141,51 H150.6" />
+    <path class="arrow" marker-end={'url(#' + arrowId + ')'} d="M28,13 H33.6" />
+    <path class="arrow" marker-end={'url(#' + arrowId + ')'} d="M64,13 H69.6" />
+    <path class="arrow" marker-end={'url(#' + arrowId + ')'} d="M102,13 H109.6" />
+    <path class="arrow" marker-end={'url(#' + arrowId + ')'} d="M86,19.5 V25.1" />
+    <path class="arrow" marker-end={'url(#' + arrowId + ')'} d="M102,32 H109.6" />
+    <path class="arrow" marker-end={'url(#' + arrowId + ')'} d="M125.5,38.5 V44.1" />
+    <path class="arrow" marker-end={'url(#' + arrowId + ')'} d="M14,19.5 V51 H109.6" />
+    <path class="arrow" marker-end={'url(#' + arrowId + ')'} d="M141,13 H150.6" />
+    <path class="arrow" marker-end={'url(#' + arrowId + ')'} d="M141,32 H150.6" />
+    <path class="arrow" marker-end={'url(#' + arrowId + ')'} d="M141,51 H150.6" />
 
     <text class="label" x="2.4" y="11.8">{en ? 'Article input' : '기사 입력'}</text>
     <text class="detail" x="2.4" y="16.8">{en ? 'Title / body' : '제목·부제·본문'}</text>

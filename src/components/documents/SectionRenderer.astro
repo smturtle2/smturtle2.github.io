@@ -1,16 +1,15 @@
 ---
-import SectionHeader from './SectionHeader.astro';
 import DocumentChildren from './DocumentChildren.astro';
-import BlockRenderer from './BlockRenderer.astro';
+import PairedBlock from './PairedBlock.astro';
 import { printGroups } from './section-layout';
+import { reserveContent } from './paired-presentation';
 import type { Locale } from '../../i18n';
-import type { Section } from '../../documents/core/model';
-interface Props { section: Section; locale: Locale; level: number; path: readonly string[]; number?: number; }
+import type { PairedSection } from '../../documents/core/pairing';
+interface Props { section: PairedSection; locale: Locale; level: number; path: readonly string[]; number?: number; }
 const { section, locale, level, path, number } = Astro.props;
 const id = path.map(encodeURIComponent).join('/');
-const titleId = `${id}/title`;
-const nextLevel = level + (section.header ? 1 : 0);
-const sections = section.children.filter((child): child is Section => child.kind === 'section');
+const nextLevel = level + (section.headers ? 1 : 0);
+const sections = section.children.filter((child): child is PairedSection => child.kind === 'section');
 const numbers = section.numberSections ? new Map(sections.map((child, index) => [child, index + 1])) : undefined;
 const layout = section.layout;
 const cuts = layout?.kind === 'linear' ? layout.allowBreakAfter : undefined;
@@ -18,38 +17,37 @@ const groups = cuts && cuts.length > 0 ? printGroups(section.children, cuts) : u
 const keepTogether = layout?.kind === 'columns' || cuts?.length === 0;
 const columnIndex = layout?.kind === 'columns' ? section.children.findIndex((child) => child.kind === 'section' && child.id === layout.asideSection) : -1;
 const asideAsset = layout?.kind === 'image-aside' ? layout.asset : undefined;
-const asideIndex = asideAsset ? section.children.findIndex((child) => child.kind === 'figure' && child.asset.id === asideAsset) : -1;
+const asideIndex = asideAsset ? section.children.findIndex((child) => child.kind === 'content' && child.variants.every((variant) => variant.value.length === 1 && variant.value[0].kind === 'figure' && variant.value[0].asset.id === asideAsset)) : -1;
 const asideFigure = asideIndex >= 0 ? section.children[asideIndex] : undefined;
+const reserveId = reserveContent(section.children)?.id;
+const reserveHeader = section.children.length === 0;
+const reserveAside = asideFigure?.kind === 'content' && asideFigure.id === reserveId;
+const headerProps = { headers: section.headers, headerLevel: level, headerRole: section.role, headerNumber: number };
 ---
-<section class:list={['section', { 'keep-together': keepTogether }]} data-role={section.role} id={id} aria-labelledby={section.header ? titleId : undefined}>
+<section class:list={['section', { 'keep-together': keepTogether }]} data-role={section.role} id={id} aria-labelledby={section.headers ? id + '/title' : undefined}>
   {layout?.kind === 'columns' ? (
     <>
-      {section.header && <SectionHeader header={section.header} level={level} role={section.role} titleId={titleId} number={number} />}
+      <DocumentChildren children={[]} locale={locale} level={nextLevel} path={path} {...headerProps} />
       <div class="layout-columns">
-        <div><DocumentChildren children={section.children.slice(0, columnIndex)} locale={locale} level={nextLevel} path={path} numbers={numbers} /></div>
+        <div><DocumentChildren children={section.children.slice(0, columnIndex)} locale={locale} level={nextLevel} path={path} numbers={numbers} reserveId={reserveId} /></div>
         <DocumentChildren children={section.children.slice(columnIndex)} locale={locale} level={nextLevel} path={path} numbers={numbers} />
       </div>
     </>
-  ) : asideFigure?.kind === 'figure' ? (
+  ) : asideFigure?.kind === 'content' ? (
     <>
-      <div class="layout-image-aside">
+      <div class:list={['layout-image-aside', { 'section-end': reserveAside }]}>
         <div class="aside-copy">
-          {section.header && <SectionHeader header={section.header} level={level} role={section.role} titleId={titleId} number={number} placement="aside" />}
-          <DocumentChildren children={section.children.slice(0, asideIndex)} locale={locale} level={nextLevel} path={path} numbers={numbers} />
+          <DocumentChildren children={section.children.slice(0, asideIndex)} locale={locale} level={nextLevel} path={path} numbers={numbers} {...headerProps} headerPlacement="aside" reserveId={reserveAside ? undefined : reserveId} />
         </div>
-        <BlockRenderer block={asideFigure} locale={locale} />
+        <PairedBlock id={id + '/' + asideFigure.id} content={asideFigure} locale={locale} asideFigure />
       </div>
-      <DocumentChildren children={section.children.slice(asideIndex + 1)} locale={locale} level={nextLevel} path={path} numbers={numbers} />
+      <DocumentChildren children={section.children.slice(asideIndex + 1)} locale={locale} level={nextLevel} path={path} numbers={numbers} reserveId={reserveId} />
     </>
   ) : groups ? groups.map((children, index) => (
     <div class="layout-group">
-      {index === 0 && section.header && <SectionHeader header={section.header} level={level} role={section.role} titleId={titleId} number={number} />}
-      <DocumentChildren children={children} locale={locale} level={nextLevel} path={path} numbers={numbers} />
+      <DocumentChildren children={children} locale={locale} level={nextLevel} path={path} numbers={numbers} {...(index === 0 ? headerProps : {})} reserveId={reserveId} reserveHeader={reserveHeader} />
     </div>
   )) : (
-    <>
-      {section.header && <SectionHeader header={section.header} level={level} role={section.role} titleId={titleId} number={number} />}
-      <DocumentChildren children={section.children} locale={locale} level={nextLevel} path={path} numbers={numbers} />
-    </>
+    <DocumentChildren children={section.children} locale={locale} level={nextLevel} path={path} numbers={numbers} {...headerProps} reserveId={reserveId} reserveHeader={reserveHeader} />
   )}
 </section>

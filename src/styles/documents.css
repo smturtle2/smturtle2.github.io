@@ -12,6 +12,26 @@
 
 /* Document base */
 .document {
+  --section-room: 0mm;
+  --space-paragraph: 2.6mm;
+  --space-block-paragraph: var(--space-paragraph);
+  --space-continuation-lead: var(--space-lead);
+  --space-lead: 3.5mm;
+  --space-list-before: 3mm;
+  --space-list-after: 3mm;
+  --space-figure: 4mm;
+  --space-table-numeric: 4mm;
+  --space-table-comparison-before: 3mm;
+  --space-table-comparison-after: 2mm;
+  --space-table-descriptive: 4mm;
+  --space-equation: 3mm;
+  --space-document-header: 0mm;
+  --space-project-header: 3.5mm;
+  --space-topic-before: 8mm;
+  --space-topic-after: 2.6mm;
+  --space-step-before: 4mm;
+  --space-step-after: 2mm;
+  --space-category-after: 2.8mm;
   font-size: 10.5pt;
   line-height: 1.6;
   letter-spacing: -0.01em;
@@ -47,7 +67,7 @@
 }
 
 .document p + p {
-  margin-top: 2.6mm;
+  margin-top: var(--space-paragraph);
 }
 
 .document img {
@@ -73,12 +93,16 @@
 }
 
 /* Identity and project headers */
+.document--portfolio {
+  --space-document-header: 6mm;
+}
+
 .document--portfolio .document-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   gap: 6mm;
-  margin-bottom: 6mm;
+  margin-bottom: var(--space-document-header);
   padding-bottom: 4mm;
   border-bottom: 1.2pt solid var(--color-ink);
 }
@@ -154,24 +178,28 @@
 }
 
 .document--portfolio .section-header[data-role="project"] {
-  margin-bottom: 3.5mm;
+  margin-bottom: var(--space-project-header);
 }
 
-:lang(en) .document .row {
+.document .paired-variant:lang(en) .row {
   flex-wrap: wrap;
   gap: 0.5mm 5mm;
 }
 
-:lang(en) .document .row .links {
+.document .paired-variant:lang(en) .row .links {
   justify-content: flex-start;
 }
 
-:lang(en) .document .row > .date {
+.document .paired-variant:lang(en) .row > .date {
   margin-left: auto;
 }
 
 /* Résumé */
 .document--resume {
+  --space-block-paragraph: 0mm;
+  --space-continuation-lead: 0mm;
+  --space-list-before: 2.2mm;
+  --space-list-after: 0mm;
   font-size: 11pt;
   line-height: 1.55;
   letter-spacing: normal;
@@ -203,7 +231,7 @@
 }
 
 .document--resume .section-title[data-role="category"] {
-  margin-bottom: 2.8mm;
+  margin-bottom: var(--space-category-after);
   padding-bottom: 1.7mm;
   border-bottom: 0.6pt solid var(--color-dark-rule);
   font-size: 12.5pt;
@@ -222,7 +250,7 @@
 }
 
 .document.document--resume .block-list {
-  margin: 2.2mm 0 0;
+  margin: var(--space-list-before) 0 var(--space-list-after);
   padding: 0;
   list-style: none;
 }
@@ -257,7 +285,7 @@
 
 /* Portfolio content and figures */
 .document .lead {
-  margin-top: 3.5mm;
+  margin-top: var(--space-lead);
 }
 
 .document figcaption {
@@ -268,7 +296,7 @@
 
 .document .block-table--numeric {
   width: auto;
-  margin: 4mm 0 0;
+  margin: var(--space-table-numeric) 0 0;
   font-variant-numeric: tabular-nums;
 }
 
@@ -306,7 +334,7 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 2mm 3mm;
-  margin: 4mm 0;
+  margin: var(--space-figure) 0;
 }
 
 .block-gallery--comparison p {
@@ -330,7 +358,7 @@
 }
 
 .document .block-table--comparison {
-  margin: 3mm 0 2mm;
+  margin: var(--space-table-comparison-before) 0 var(--space-table-comparison-after);
 }
 
 .block-table--comparison :where(th, td) {
@@ -387,7 +415,7 @@
 }
 
 .block-table--descriptive {
-  margin: 4mm 0;
+  margin: var(--space-table-descriptive) 0;
 }
 
 .block-table--descriptive :where(th, td) {
@@ -408,7 +436,7 @@
 }
 
 .document .equation-expression {
-  margin: 3mm 0;
+  margin: var(--space-equation) 0;
   overflow-x: auto;
   font: 9pt/1.4 'DejaVu Sans Mono', monospace;
   white-space: nowrap;
@@ -445,7 +473,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 2mm 3mm;
-  margin: 4mm 0;
+  margin: var(--space-figure) 0;
 }
 
 .block-gallery--sequence p {
@@ -459,14 +487,14 @@
 }
 
 .document--portfolio .section-title[data-role="topic"] {
-  margin: 8mm 0 2.6mm;
+  margin: var(--space-topic-before) 0 var(--space-topic-after);
   padding-bottom: 2mm;
   border-bottom: 0.8pt solid var(--color-ink);
   font-size: 13pt;
 }
 
 .document--portfolio .section-title[data-role="step"] {
-  margin: 4mm 0 2mm;
+  margin: var(--space-step-before) 0 var(--space-step-after);
   font-size: 11pt;
   line-height: 1.35;
 }
@@ -495,7 +523,7 @@
 }
 
 .document .block-list {
-  margin: 3mm 0;
+  margin: var(--space-list-before) 0 var(--space-list-after);
   padding-left: 4.5mm;
 }
 
@@ -511,11 +539,11 @@
 
 .document .block-figure--detail {
   max-width: 60%;
-  margin: 4mm auto;
+  margin: var(--space-figure) auto;
 }
 
 .document .block-figure--screen {
-  margin: 4mm 0;
+  margin: var(--space-figure) 0;
 }
 
 .block-figure--detail figcaption,
@@ -562,7 +590,7 @@
   margin-top: 0;
 }
 
-.document .layout-image-aside > .block-figure {
+.document .layout-image-aside .paired-block[data-pair-aside] .block-figure {
   margin: 0;
   max-width: none;
 }
@@ -571,13 +599,33 @@
   white-space: nowrap;
 }
 
-.layout-image-aside > .block-figure img {
+.layout-image-aside .paired-block[data-pair-aside] img {
   border: 0.6pt solid var(--color-rule);
 }
 
 /* Diagram presentation; components own only geometry and labels. */
 .document .block-figure--wide {
-  margin: 4mm 0;
+  margin: var(--space-figure) 0;
+}
+
+/* One semantic tree; language variants only share space in print. */
+.paired-block,
+.paired-variant[data-active] {
+  display: contents;
+}
+
+.paired-variant:not([data-active]) {
+  display: none;
+}
+
+@media screen {
+  .document .paired-variant[data-paragraph-continuation] > .block-paragraph:first-child {
+    margin-top: var(--space-block-paragraph);
+  }
+
+  .document .paired-variant[data-first-kind~="lead-continuation"] > .block-paragraph:first-child {
+    margin-top: max(var(--space-block-paragraph), var(--space-continuation-lead));
+  }
 }
 
 .diagram-viewport {
@@ -639,7 +687,7 @@
     display: block;
   }
 
-  .document .layout-image-aside > .block-figure {
+  .document .layout-image-aside .paired-block[data-pair-aside] .block-figure {
     width: min(100%, 42mm);
     margin: 3mm 0 0;
   }
@@ -750,6 +798,86 @@
   .document {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  .paired-block {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    margin-block-start: max(var(--pair-start-list, 0mm), var(--pair-start-lead, 0mm), var(--pair-start-paragraph, 0mm), var(--pair-start-continuation-lead, 0mm), var(--pair-start-figure, 0mm), var(--pair-start-numeric, 0mm), var(--pair-start-comparison, 0mm), var(--pair-start-descriptive, 0mm), var(--pair-start-equation, 0mm), var(--pair-start-header, 0mm));
+    margin-block-end: max(var(--pair-end-list, 0mm), var(--pair-end-figure, 0mm), var(--pair-end-comparison, 0mm), var(--pair-end-descriptive, 0mm), var(--pair-end-equation, 0mm), var(--pair-end-header, 0mm));
+    break-inside: avoid;
+  }
+
+  .paired-block > .paired-variant {
+    display: flow-root;
+    grid-area: 1 / 1;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .paired-variant:not([data-active]) {
+    display: flow-root;
+    visibility: hidden;
+  }
+
+  .document .paired-variant > :first-child {
+    margin-block-start: 0;
+  }
+
+  .document .paired-variant > :last-child {
+    margin-block-end: 0;
+  }
+
+  .paired-heading {
+    break-after: avoid;
+  }
+
+  .section-end {
+    padding-block-end: var(--section-room);
+  }
+
+  /* New block kinds must define their edge spacing here before edge margins are reset. */
+  .paired-block[data-start-kinds~="list"] { --pair-start-list: var(--space-list-before); }
+  .paired-block[data-end-kinds~="list"] { --pair-end-list: var(--space-list-after); }
+  .paired-block[data-start-kinds~="lead"] { --pair-start-lead: var(--space-lead); }
+  .paired-block[data-start-kinds~="paragraph-continuation"] { --pair-start-paragraph: var(--space-block-paragraph); }
+  .paired-block[data-start-kinds~="lead-continuation"] { --pair-start-continuation-lead: var(--space-continuation-lead); }
+
+  .paired-block:is([data-start-kinds~="figure-wide"], [data-start-kinds~="figure-detail"], [data-start-kinds~="figure-screen"], [data-start-kinds~="gallery-sequence"], [data-start-kinds~="gallery-comparison"]) { --pair-start-figure: var(--space-figure); }
+  .paired-block:is([data-end-kinds~="figure-wide"], [data-end-kinds~="figure-detail"], [data-end-kinds~="figure-screen"], [data-end-kinds~="gallery-sequence"], [data-end-kinds~="gallery-comparison"]) { --pair-end-figure: var(--space-figure); }
+  .paired-block[data-start-kinds~="table-numeric"] { --pair-start-numeric: var(--space-table-numeric); }
+  .paired-block[data-start-kinds~="table-comparison"] { --pair-start-comparison: var(--space-table-comparison-before); }
+  .paired-block[data-end-kinds~="table-comparison"] { --pair-end-comparison: var(--space-table-comparison-after); }
+  .paired-block[data-start-kinds~="table-descriptive"] { --pair-start-descriptive: var(--space-table-descriptive); }
+  .paired-block[data-end-kinds~="table-descriptive"] { --pair-end-descriptive: var(--space-table-descriptive); }
+  .paired-block:is([data-start-kinds~="equation"], [data-start-kinds~="equation-explained"]) { --pair-start-equation: var(--space-equation); }
+  .paired-block[data-end-kinds~="equation"] { --pair-end-equation: var(--space-equation); }
+
+  .document .paired-variant > .block-equation:first-child > .equation-expression {
+    margin-block-start: 0;
+  }
+
+  .document .paired-variant[data-last-kind="equation"] > .block-equation:last-child > .equation-expression {
+    margin-block-end: 0;
+  }
+
+  .document--portfolio .paired-block[data-header-role="project"] { --pair-header-after: var(--space-project-header); }
+  .document--portfolio .paired-block[data-header-role="topic"] { --pair-header-before: var(--space-topic-before); --pair-header-after: var(--space-topic-after); }
+  .document--portfolio .paired-block[data-header-role="step"] { --pair-header-before: var(--space-step-before); --pair-header-after: var(--space-step-after); }
+  .document--resume .paired-block[data-header-role="category"] { --pair-header-after: var(--space-category-after); }
+  .paired-block[data-header-placement="aside"] { --pair-header-before: 0mm; }
+  .paired-block:is([data-start-kinds~="header-simple"], [data-start-kinds~="header-detailed"]) { --pair-start-header: var(--pair-header-before, 0mm); }
+  .paired-block:is([data-end-kinds~="header-simple"], [data-end-kinds~="header-detailed"]) { --pair-end-header: var(--pair-header-after, 0mm); }
+  .paired-block[data-end-kinds~="document-header"] { --pair-end-header: var(--space-document-header); }
+
+  .paired-block[data-pair-aside] {
+    --pair-start-figure: 0mm;
+    --pair-end-figure: 0mm;
+  }
+
+  .paired-variant .block-figure--detail {
+    width: 60%;
   }
 
   .sheet {

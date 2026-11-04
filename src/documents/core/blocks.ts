@@ -3,12 +3,12 @@ import type {
   ListBlock, ParagraphBlock, RichText, TableBlock,
 } from './model';
 
-export function paragraph(content: RichText, options: Pick<ParagraphBlock, 'lead'> = {}): ParagraphBlock {
+export function paragraph(content: RichText, options: Pick<ParagraphBlock, 'id' | 'lead'> = {}): ParagraphBlock {
   return { kind: 'paragraph', content, ...options };
 }
 
-export function list(items: ListBlock['items']): ListBlock {
-  return { kind: 'list', items };
+export function list(items: ListBlock['items'], options: Pick<ListBlock, 'id'> = {}): ListBlock {
+  return { kind: 'list', items, ...options };
 }
 
 type FigureOptions = Pick<FigureBlock, 'caption' | 'variant'>;
@@ -33,6 +33,6 @@ export function table(options: WithoutKind<TableBlock>): TableBlock {
   return { kind: 'table', ...options };
 }
 
-export function equation(expression: string, options: Pick<EquationBlock, 'href' | 'explanation'> = {}): EquationBlock {
+export function equation(expression: string, options: Pick<EquationBlock, 'id' | 'href' | 'explanation'>): EquationBlock {
   return { kind: 'equation', expression, ...options };
 }

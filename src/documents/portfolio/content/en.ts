@@ -71,6 +71,7 @@ export const en = {
                   'Mixed 64 learned 13-band vectors with per-pixel weights from the cloud component to form the mask',
                 ]),
                 equation(blending, {
+                  id: 'input-candidate-blending',
                   href: 'https://github.com/smturtle2/cr-project/blob/decdb3342954d21ea8132efd6722b04fc33050f4/modules/model/CLEAR_Net/clear_net.py#L140',
                   explanation: 'For each pixel and band, a mask near 0 favors the input; a mask near 1 favors the candidate',
                 }),
@@ -79,6 +80,7 @@ export const en = {
                 ]),
                 table({
                   columns: ['Training target', 'Loss', 'Purpose'],
+                  id: 'restoration-losses',
                   variant: 'descriptive',
                   rows: [
                     { cells: ['Final output', 'L1+SSIM', 'Penalize pixel and structural differences'] },
@@ -170,6 +172,7 @@ export const en = {
                 ]),
                 table({
                   columns: ['Approach', 'Selection and order', 'Local storage'],
+                  id: 'streaming-approaches',
                   variant: 'descriptive',
                   rows: [
                     { cells: ['HF streaming', 'Shuffle/termination issues in the initial implementation', 'No full copy needed'] },

@@ -1,0 +1,57 @@
+---
+import BlockRenderer from './BlockRenderer.astro';
+import DocumentHeader from './DocumentHeader.astro';
+import SectionHeader from './SectionHeader.astro';
+import { blockKinds, headerKinds } from './paired-presentation';
+import type { Locale } from '../../i18n';
+import type { DocumentHeader as HeaderValue, Header } from '../../documents/core/model';
+import type { LocaleVariant, PairedContent } from '../../documents/core/pairing';
+
+interface Props {
+  id: string;
+  locale: Locale;
+  content?: PairedContent;
+  previousContent?: PairedContent;
+  headers?: readonly LocaleVariant<Header>[];
+  documentHeaders?: readonly LocaleVariant<HeaderValue>[];
+  level?: number;
+  role?: string;
+  titleId?: string;
+  number?: number;
+  placement?: 'aside';
+  sectionEnd?: boolean;
+  asideFigure?: boolean;
+}
+const { id, locale, content, previousContent, headers, documentHeaders, level = 2, role = '', titleId = `${id}/title`, number, placement, sectionEnd = false, asideFigure = false } = Astro.props;
+const locales = (content?.variants ?? headers ?? documentHeaders ?? []).map((variant) => variant.locale);
+if (!locales.length) throw new Error(`Paired block ${id} has no variants`);
+const variants = locales.map((variantLocale) => {
+  const blocks = content?.variants.find((variant) => variant.locale === variantLocale)?.value ?? [];
+  const header = headers?.find((variant) => variant.locale === variantLocale)?.value;
+  const documentHeader = documentHeaders?.find((variant) => variant.locale === variantLocale)?.value;
+  const firstBlock = blocks[0];
+  const preceding = previousContent?.variants.find((variant) => variant.locale === variantLocale)?.value.at(-1);
+  const paragraphContinuation = !header && !documentHeader && preceding?.kind === 'paragraph' && firstBlock?.kind === 'paragraph';
+  const firstKinds = documentHeader ? ['document-header'] : header ? headerKinds(header) : paragraphContinuation
+    ? ['paragraph', 'paragraph-continuation', ...(firstBlock.kind === 'paragraph' && firstBlock.lead ? ['lead-continuation'] : [])]
+    : blockKinds(firstBlock);
+  const lastKinds = blocks.length ? blockKinds(blocks.at(-1)) : firstKinds;
+  return { locale: variantLocale, blocks, header, documentHeader, firstKinds, lastKinds, paragraphContinuation };
+});
+const startKinds = [...new Set(variants.flatMap((variant) => variant.firstKinds))].join(' ');
+const endKinds = [...new Set(variants.flatMap((variant) => variant.lastKinds))].join(' ');
+const headingOnly = !content && Boolean(headers || documentHeaders);
+---
+<div class:list={['paired-block', { 'paired-heading': headingOnly, 'section-end': sectionEnd }]} data-pair={id} data-pair-aside={asideFigure ? '' : undefined} data-start-kinds={startKinds} data-end-kinds={endKinds} data-header-role={headers ? role : undefined} data-header-placement={placement}>
+  {variants.map((variant) => {
+    const active = variant.locale === locale;
+    const namespace = `${id}/${variant.locale}`;
+    return (
+      <div class="paired-variant" lang={variant.locale} data-active={active ? '' : undefined} aria-hidden={active ? undefined : 'true'} inert={!active} data-paragraph-continuation={variant.paragraphContinuation ? '' : undefined} data-first-kind={variant.firstKinds.join(' ')} data-last-kind={variant.lastKinds.join(' ')}>
+        {variant.documentHeader && <DocumentHeader header={variant.documentHeader} />}
+        {variant.header && <SectionHeader header={variant.header} level={level} role={role} titleId={active ? titleId : `${titleId}/${variant.locale}`} number={number} placement={placement} />}
+        {variant.blocks.map((block) => <BlockRenderer block={block} locale={variant.locale} idPrefix={namespace} />)}
+      </div>
+    );
+  })}
+</div>
