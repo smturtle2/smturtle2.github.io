@@ -691,11 +691,16 @@
   }
 
   .document--portfolio .section[data-role="project"] + .section[data-role="project"]::before {
+    --separator-color: #e7e9ed;
     position: absolute;
-    top: 0;
-    left: -20mm;
-    right: -20mm;
-    border-top: 3px solid var(--color-ink);
+    top: -10px;
+    left: 0;
+    right: 0;
+    height: 24px;
+    background: var(--separator-color);
+    /* Extend the paint to the viewport edges without widening the page. */
+    box-shadow: 0 0 0 100vmax var(--separator-color);
+    clip-path: inset(0 -100vmax);
     content: '';
   }
 
@@ -785,8 +790,8 @@
   }
 
   .document--portfolio .section[data-role="project"] + .section[data-role="project"]::before {
-    left: -20px;
-    right: -20px;
+    top: -6px;
+    height: 16px;
   }
 
   .document--portfolio .section-title[data-role="project"] {
